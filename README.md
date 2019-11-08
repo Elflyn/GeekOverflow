@@ -7,3 +7,7 @@
 4. `git clone https://github.com/Elflyn/GeekOverflow.git && cd GeekOverflow/TritonDeal`
 5. `npm install -g yarn && yarn install`
 6. `npx react-native run-android`
+
+## Note
+
+Run `yarn install` whenever you see something like `warn Package xxx has been ignored because it contains invalid configuration. Reason: Cannot find module 'xxx\package.json'`.
