@@ -5,5 +5,5 @@
 3. Do "Installing dependencies" and "Preparing the Android device".  
 **DO NOT** do anything else.
 4. `git clone https://github.com/Elflyn/GeekOverflow.git && cd GeekOverflow/TritonDeal`
-5. `npm install yarn && yarn install`
+5. `npm install -g yarn && yarn install`
 6. `npx react-native run-android`
