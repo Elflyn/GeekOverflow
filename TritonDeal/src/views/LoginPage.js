@@ -6,17 +6,39 @@ import {
   Text,
   ImageBackground,
   TouchableOpacity,
+  ToastAndroid,
 } from 'react-native';
 import {Actions} from 'react-native-router-flux';
 import {HEADER} from '../images';
 import Login from '../components/Login';
+import { firebase } from '@react-native-firebase/auth';
+import GradientButton from '../components/GradientButton';
 
 class LoginPage extends Component {
+
+  handleSignOut = () => {
+    firebase.auth().signOut().then(() => ToastAndroid.show('Successfully signed out.', ToastAndroid.SHORT)).catch(function (error) {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      if (errorCode) {
+        if (errorCode == 'auth/no-current-user') {
+          ToastAndroid.show('No user is currently signed in.', ToastAndroid.SHORT);
+        } else {
+          ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+        }
+      }
+    });
+  };
+
   render() {
     return (
       <ImageBackground source={HEADER} style={style.header}>
         <Text style={style.text}>Triton Deal</Text>
         <Login />
+        <GradientButton
+          text={"Sign Out"}
+          onPress={this.handleSignOut}
+        />
         <View style={style.bottomTextContainer}>
           <View style={style.bottomTextWrapper}>
             <TouchableOpacity>
@@ -24,7 +46,13 @@ class LoginPage extends Component {
             </TouchableOpacity>
           </View>
           <View tyle={style.bottomTextWrapper}>
-            <TouchableOpacity onPress={() => Actions.signup('Triton Deal')}>
+            <TouchableOpacity onPress={() => {
+              if (!firebase.auth().currentUser) {
+                Actions.signup('Triton Deal')
+              } else {
+                ToastAndroid.show('You have already signed in', ToastAndroid.SHORT);
+              }
+            }}>
               <Text style={style.bottomText}>Sign Up</Text>
             </TouchableOpacity>
           </View>
