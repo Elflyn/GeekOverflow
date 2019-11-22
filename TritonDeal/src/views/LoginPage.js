@@ -1,5 +1,6 @@
-import React, {Component} from 'react';
-import {Input, Icon, Button} from 'react-native-elements';
+import React, { Component } from 'react';
+import { Input, Icon, Button } from 'react-native-elements';
+import { Linking } from 'react-native';
 import {
   StyleSheet,
   View,
@@ -7,14 +8,72 @@ import {
   ImageBackground,
   TouchableOpacity,
   ToastAndroid,
+  Alert
 } from 'react-native';
-import {Actions} from 'react-native-router-flux';
-import {HEADER} from '../images';
+import { Actions } from 'react-native-router-flux';
+import { HEADER } from '../images';
 import Login from '../components/Login';
-import { firebase } from '@react-native-firebase/auth';
+import { firebase } from '@react-native-firebase/dynamic-links';
 import GradientButton from '../components/GradientButton';
 
+function parseURL(url) {
+  var regex = /[?&]([^=#]+)=([^&#]*)/g,
+    params = {},
+    match;
+  while (match = regex.exec(url)) {
+    params[match[1]] = match[2];
+  }
+  return params;
+}
+
 class LoginPage extends Component {
+
+  componentDidMount() {
+    Linking.getInitialURL().then(this.handeLaunchByUrl);
+    Linking.addEventListener("url", this.handeLaunchByUrl);
+  }
+
+  componentWillUnmount() {
+    Linking.removeEventListener("url", this.handeLaunchByUrl);
+  }
+
+  handeLaunchByUrl = (event) => {
+    if (event.url) {
+      var deepLinkParams = parseURL(decodeURIComponent(parseURL(event.url).link));
+      var mode = deepLinkParams.mode;
+      var oobCode = deepLinkParams.oobCode;
+
+      switch (mode) {
+        case 'verifyEmail':
+          this.handleVerifyEmail(oobCode);
+          break;
+        default:
+          console.warn('Wrong action!');
+      }
+    }
+  };
+
+  handleVerifyEmail = (oobCode) => {
+    firebase.auth().applyActionCode(oobCode).then(() => {
+      Alert.alert(
+        null,
+        'Thank you. Your email address has been verified.',
+        [{text: 'OK'}],
+      );
+    }).catch(function (error) {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      if (errorCode) {
+        if (errorCode == 'auth/expired-action-code') {
+          ToastAndroid.show('Your verification link has expired.', ToastAndroid.SHORT);
+        } else if (errorCode == 'auth/invalid-action-code') {
+          ToastAndroid.show('Your verification link is invalid.', ToastAndroid.SHORT);
+        } else {
+          ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+        }
+      }
+    });
+  }
 
   handleSignOut = () => {
     firebase.auth().signOut().then(() => ToastAndroid.show('Successfully signed out.', ToastAndroid.SHORT)).catch(function (error) {
@@ -49,8 +108,13 @@ class LoginPage extends Component {
             <TouchableOpacity onPress={() => {
               if (!firebase.auth().currentUser) {
                 Actions.signup('Triton Deal')
-              } else {
+              } else if (firebase.auth().currentUser.emailVerified){
                 ToastAndroid.show('You have already signed in', ToastAndroid.SHORT);
+              } else {
+                Alert.alert(
+                  null,
+                  'An email with your account verification link has been sent to your email address. Please check your inbox.'
+                );
               }
             }}>
               <Text style={style.bottomText}>Sign Up</Text>
@@ -65,7 +129,7 @@ class LoginPage extends Component {
 
 const ThirdPartyLogin = () => (
   <View>
-    <View style={{flexDirection: 'row'}}>
+    <View style={{ flexDirection: 'row' }}>
       <View style={style.line} />
       <Text style={style.middleText}>Or connect with</Text>
       <View style={style.line} />
