@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, Linking, TouchableOpacity, ToastAndroid } from 'react-native';
+import { StyleSheet, View, Text, Linking, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
 import { Input, Icon } from 'react-native-elements';
 import GradientButton from './GradientButton';
 import auth from '@react-native-firebase/auth';
@@ -17,10 +17,31 @@ export default class Register extends React.Component {
   componentDidMount = () => {
     var unsub = firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        ToastAndroid.show('Successfully registered.', ToastAndroid.SHORT);
-        Actions.pop();
+        if (!user.emailVerified) {
+          var actionCodeSettings = {
+            url: 'https://ucsd.edu',
+            android: {
+              packageName: 'com.tritondeal',
+              installApp: true,
+              minimumVersion: '12'
+            },
+            handleCodeInApp: true,
+            dynamicLinkDomain: "tritondeal.page.link"
+          };
+          user.sendEmailVerification(actionCodeSettings).then(() => {
+            Alert.alert(
+              null,
+              'Verification link has been sent to your email address.',
+              [
+                {text: 'OK', onPress: () => {Actions.pop()}}
+              ],
+              {cancelable: false}
+            );
+          });
+        }
       }
     });
+    
     this.setState({ unsubscribe: unsub });
   };
 
