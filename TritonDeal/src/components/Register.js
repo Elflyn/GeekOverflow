@@ -32,15 +32,18 @@ const Register = () => (
     <Input
       placeholder="Phone number"
       leftIcon={
-        <Icon iconStyle={style.iconStyle} name="phone-android" type="MaterialIcons" />
+        <Icon
+          iconStyle={style.iconStyle}
+          name="phone-android"
+          type="MaterialIcons"
+        />
       }
     />
-    <GradientButton text={"Sign Up"} />
+    <GradientButton text={'Sign Up'} />
   </View>
 );
 
 const style = StyleSheet.create({
-
   iconContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -62,7 +65,7 @@ const style = StyleSheet.create({
   container: {
     paddingHorizontal: 38,
     textAlign: 'center',
-  }
-});;
+  },
+});
 
 export default Register;

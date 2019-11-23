@@ -1,6 +1,5 @@
 import React from 'react';
-import {View, Text, Button, StyleSheet} from 'react-native';
-import {Text as H} from 'react-native-elements';
+import {View, Text, StyleSheet} from 'react-native';
 import Register from '../components/Register';
 
 const SignupPage = () => {
@@ -24,10 +23,8 @@ const style = StyleSheet.create({
     fontSize: 20,
     marginLeft: 20,
     color: 'grey',
-    marginBottom: 20
-  }
-})
-
+    marginBottom: 20,
+  },
+});
 
 export default SignupPage;
-
