@@ -5,8 +5,13 @@ import GradientButton from './GradientButton';
 import auth from '@react-native-firebase/auth';
 import { firebase } from '@react-native-firebase/auth';
 import { Actions } from 'react-native-router-flux';
+import Dialog from '../views/Overlay';
 
 export default class Register extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {isVisible: false, text: "empty"};
+    }
 
   state = {
     email: 'example@ucsd.edu',
@@ -58,7 +63,7 @@ export default class Register extends React.Component {
         var errorMessage = error.message;
         if (errorCode) {
           if (errorCode == 'auth/weak-password') {
-            ToastAndroid.show('The password is too weak.', ToastAndroid.SHORT);
+              this.setState({ isVisible: true, text:"Your password is too weak."});
           } else if (errorCode == 'auth/invalid-email') {
             ToastAndroid.show('The email address is invalid.', ToastAndroid.SHORT);
           } else if (errorCode == 'auth/email-already-in-use') {
@@ -114,6 +119,7 @@ export default class Register extends React.Component {
           text={"Sign Up"}
           onPress={this.handleCreateUser}
         />
+        <Dialog isVisible={this.state.isVisible} text={this.state.text}/>
       </View>
     )
   };
