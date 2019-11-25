@@ -5,14 +5,22 @@ import LoginPage from './src/views/LoginPage';
 import SignupPage from './src/views/SignupPage';
 import Profile from './src/views/Profile';
 import {Icon} from 'react-native-elements';
+import Dialog from './src/components/Overlay';
+import EditProfile from './src/views/EditProfile';
 
 const RouterComponent = () => {
-  return (
+  return(
     <Router>
       <Stack key="root" headerLayoutPreset="center">
-        <Scene key="profile" hideNavBar={true} component={Profile} />
-        <Scene
-          key="signup"
+        <Scene key="EditProfile"
+               component={EditProfile}
+               navigationBarStyle={style.nav}
+               title="Edit Profile"
+               titleStyle={style.title}
+               renderLeftButton={() => renderBackButton()}
+        />
+        <Scene key="login" hideNavBar={true} component={LoginPage} />
+        <Scene key="signup"
           component={SignupPage}
           navigationBarStyle={style.nav}
           title="Register"

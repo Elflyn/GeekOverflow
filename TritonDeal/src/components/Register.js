@@ -5,7 +5,7 @@ import GradientButton from './GradientButton';
 import auth from '@react-native-firebase/auth';
 import { firebase } from '@react-native-firebase/auth';
 import { Actions } from 'react-native-router-flux';
-import Dialog from '../views/Overlay';
+import Dialog from './Overlay';
 
 export default class Register extends React.Component {
     constructor(props) {
