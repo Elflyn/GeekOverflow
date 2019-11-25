@@ -4,11 +4,20 @@ import {Scene, Router, Stack, Actions} from 'react-native-router-flux';
 import LoginPage from './src/views/LoginPage';
 import SignupPage from './src/views/SignupPage';
 import {Icon} from 'react-native-elements';
+import Dialog from './src/components/Overlay';
+import EditProfile from './src/views/EditProfile';
 
 const RouterComponent = () => {
-  return (
+  return(
     <Router>
       <Stack key="root" headerLayoutPreset="center">
+        <Scene key="EditProfile"
+               component={EditProfile}
+               navigationBarStyle={style.nav}
+               title="Edit Profile"
+               titleStyle={style.title}
+               renderLeftButton={() => renderBackButton()}
+        />
         <Scene key="login" hideNavBar={true} component={LoginPage} />
         <Scene key="signup"
           component={SignupPage}
