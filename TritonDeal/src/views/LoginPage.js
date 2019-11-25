@@ -44,7 +44,7 @@ class LoginPage extends Component {
   }
 
   handeLaunchByUrl = (event) => {
-    if (event.url) {
+    if (event) {
       var deepLinkParams = parseURL(decodeURIComponent(parseURL(event.url).link));
       var mode = deepLinkParams.mode;
       var oobCode = deepLinkParams.oobCode;
@@ -66,6 +66,7 @@ class LoginPage extends Component {
         'Thank you. Your email address has been verified.',
         [{text: 'OK'}],
       );
+      firebase.auth().updateCurrentUser();
     }).catch(error => {
       var errorCode = error.code;
       var errorMessage = error.message;
@@ -134,18 +135,22 @@ class LoginPage extends Component {
             <TouchableOpacity onPress={() => {
               if (!firebase.auth().currentUser) {
                 Actions.signup('Triton Deal')
-              } else if (firebase.auth().currentUser.emailVerified){
-                this.setState(prev => ({
-                  ...prev,
-                  isVisible: true,
-                  dialogText: message.SIGNED_IN,
-                }));
               } else {
-                this.setState(prev => ({
-                  ...prev,
-                  isVisible: true,
-                  dialogText: message.VALIDATE_EAMIL,
-                }));
+                firebase.auth().currentUser.reload().then(() => {
+                  if (firebase.auth().currentUser.emailVerified) {
+                    this.setState(prev => ({
+                      ...prev,
+                      isVisible: true,
+                      dialogText: message.SIGNED_IN,
+                    }));
+                  } else {
+                    this.setState(prev => ({
+                      ...prev,
+                      isVisible: true,
+                      dialogText: message.EMAIL_NOT_VARIFIED,
+                    }));
+                  }
+                })
               }
             }}>
               <Text style={style.bottomText}>Sign Up</Text>

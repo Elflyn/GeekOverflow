@@ -22,43 +22,62 @@ export default class Login extends React.Component {
 
   handleLogin = () => {
     if (this.state.password && this.state.email) {
-      firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
-        if (!firebase.auth().currentUser.emailVerified) {
-          this.setState(prev => ({
-            ...prev,
-            isVisible: true,
-            dialogText: message.EMAIL_NOT_VARIFIED,
-          }));
-        } else {
-          this.setState(prev => ({
-            ...prev,
-            isVisible: true,
-            dialogText: message.LOGIN_SUCCESS,
-          }));
-        }
-      }).catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        if (errorCode) {
-          if (errorCode == 'auth/invalid-email') {
-            this.setState(prev=> ({...prev, passwordError: '', emailError: message.INVALIDEMAIL}))
-          } else if (errorCode == 'auth/user-disabled') {
+      if (!firebase.auth().currentUser) {
+        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
+          if (!firebase.auth().currentUser.emailVerified) {
             this.setState(prev => ({
               ...prev,
               isVisible: true,
-              dialogText: message.ACCOUNT_DISABLED,
+              dialogText: message.EMAIL_NOT_VARIFIED,
             }));
-          } else if (errorCode ==='auth/user-not-found' || errorCode === 'auth/wrong-password') {
-            this.setState(prev => ({...prev, emailError: '', passwordError: message.WORNGCOMBINATION}))
           } else {
             this.setState(prev => ({
               ...prev,
               isVisible: true,
-              dialogText: errorMessage,
+              dialogText: message.LOGIN_SUCCESS,
             }));
           }
-        }
-      });
+        }).catch((error) => {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          if (errorCode) {
+            if (errorCode == 'auth/invalid-email') {
+              this.setState(prev => ({ ...prev, passwordError: '', emailError: message.INVALID_EMAIL }))
+            } else if (errorCode == 'auth/user-disabled') {
+              this.setState(prev => ({
+                ...prev,
+                isVisible: true,
+                dialogText: message.ACCOUNT_DISABLED,
+              }));
+            } else if (errorCode === 'auth/user-not-found' || errorCode === 'auth/wrong-password') {
+              this.setState(prev => ({ ...prev, emailError: '', passwordError: message.WORNG_COMBINATION }))
+            } else {
+              this.setState(prev => ({
+                ...prev,
+                isVisible: true,
+                dialogText: errorMessage,
+              }));
+            }
+          }
+        });
+
+      } else {
+        firebase.auth().currentUser.reload().then(() => {
+          if (firebase.auth().currentUser.emailVerified) {
+            this.setState(prev => ({
+              ...prev,
+              isVisible: true,
+              dialogText: message.SIGNED_IN,
+            }));
+          } else {
+            this.setState(prev => ({
+              ...prev,
+              isVisible: true,
+              dialogText: message.EMAIL_NOT_VARIFIED,
+            }));
+          }
+        })
+      }
     }
   }
 
@@ -99,8 +118,8 @@ export default class Login extends React.Component {
           onPress={() => Linking.openURL('http://google.com')}>
           Forget password?
     </Text>
-        <GradientButton text={"Log in"} onPress = {this.handleLogin} />
-        <Dialog text={this.state.dialogText} isVisible={this.state.isVisible} onPress={() => {this.setState({isVisible: false})}} />
+        <GradientButton text={"Log in"} onPress={this.handleLogin} />
+        <Dialog text={this.state.dialogText} isVisible={this.state.isVisible} onPress={() => { this.setState({ isVisible: false }) }} />
       </View>
     );
   }
