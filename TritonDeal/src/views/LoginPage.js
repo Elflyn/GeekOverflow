@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Input, Icon, Button } from 'react-native-elements';
-import { Linking } from 'react-native';
+import { Input, Icon, Button, Overlay } from 'react-native-elements';
+import { Linking, ActivityIndicator } from 'react-native';
 import {
   StyleSheet,
   View,
@@ -10,7 +10,7 @@ import {
   ToastAndroid,
   Alert
 } from 'react-native';
-import { Actions } from 'react-native-router-flux';
+import { Actions} from 'react-native-router-flux';
 import { HEADER } from '../images';
 import Login from '../components/Login';
 import { firebase } from '@react-native-firebase/dynamic-links';
@@ -32,6 +32,7 @@ class LoginPage extends Component {
   state = {
     isVisible: false,
     dialogText: '',
+    finished: true,
   };
 
   componentDidMount() {
@@ -66,7 +67,7 @@ class LoginPage extends Component {
         'Thank you. Your email address has been verified.',
         [{text: 'OK'}],
       );
-      firebase.auth().updateCurrentUser();
+      firebase.auth().currentUser.reload();
     }).catch(error => {
       var errorCode = error.code;
       var errorMessage = error.message;
@@ -128,7 +129,7 @@ class LoginPage extends Component {
         <View style={style.bottomTextContainer}>
           <View style={style.bottomTextWrapper}>
             <TouchableOpacity>
-              <Text style={style.bottomText}>Skip Login</Text>
+              <Text style={style.bottomText} onPress={() => Actions.EditProfile()}>Skip Login</Text>
             </TouchableOpacity>
           </View>
           <View tyle={style.bottomTextWrapper}>
