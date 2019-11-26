@@ -15,6 +15,8 @@ import { HEADER } from '../images';
 import Login from '../components/Login';
 import { firebase } from '@react-native-firebase/dynamic-links';
 import GradientButton from '../components/GradientButton';
+import Dialog from '../components/Dialog';
+import message from '../message';
 
 function parseURL(url) {
   var regex = /[?&]([^=#]+)=([^&#]*)/g,
@@ -27,6 +29,10 @@ function parseURL(url) {
 }
 
 class LoginPage extends Component {
+  state = {
+    isVisible: false,
+    dialogText: '',
+  };
 
   componentDidMount() {
     Linking.getInitialURL().then(this.handeLaunchByUrl);
@@ -38,7 +44,7 @@ class LoginPage extends Component {
   }
 
   handeLaunchByUrl = (event) => {
-    if (event.url) {
+    if (event) {
       var deepLinkParams = parseURL(decodeURIComponent(parseURL(event.url).link));
       var mode = deepLinkParams.mode;
       var oobCode = deepLinkParams.oobCode;
@@ -60,30 +66,51 @@ class LoginPage extends Component {
         'Thank you. Your email address has been verified.',
         [{text: 'OK'}],
       );
-    }).catch(function (error) {
+      firebase.auth().updateCurrentUser();
+    }).catch(error => {
       var errorCode = error.code;
       var errorMessage = error.message;
       if (errorCode) {
         if (errorCode == 'auth/expired-action-code') {
-          ToastAndroid.show('Your verification link has expired.', ToastAndroid.SHORT);
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: message.LINK_EXPIRE,
+          }));
         } else if (errorCode == 'auth/invalid-action-code') {
-          ToastAndroid.show('Your verification link is invalid.', ToastAndroid.SHORT);
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: message.LINK_INVALID,
+          }));
         } else {
-          ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: errorMessage,
+          }));
         }
       }
     });
   }
 
   handleSignOut = () => {
-    firebase.auth().signOut().then(() => ToastAndroid.show('Successfully signed out.', ToastAndroid.SHORT)).catch(function (error) {
+    firebase.auth().signOut().then(() => ToastAndroid.show('Successfully signed out.', ToastAndroid.SHORT)).catch(error => {
       var errorCode = error.code;
       var errorMessage = error.message;
       if (errorCode) {
         if (errorCode == 'auth/no-current-user') {
-          ToastAndroid.show('No user is currently signed in.', ToastAndroid.SHORT);
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: message.NO_USER,
+          }));
         } else {
-          ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: errorMessage,
+          }));
         }
       }
     });
@@ -108,19 +135,29 @@ class LoginPage extends Component {
             <TouchableOpacity onPress={() => {
               if (!firebase.auth().currentUser) {
                 Actions.signup('Triton Deal')
-              } else if (firebase.auth().currentUser.emailVerified){
-                ToastAndroid.show('You have already signed in', ToastAndroid.SHORT);
               } else {
-                Alert.alert(
-                  null,
-                  'An email with your account verification link has been sent to your email address. Please check your inbox.'
-                );
+                firebase.auth().currentUser.reload().then(() => {
+                  if (firebase.auth().currentUser.emailVerified) {
+                    this.setState(prev => ({
+                      ...prev,
+                      isVisible: true,
+                      dialogText: message.SIGNED_IN,
+                    }));
+                  } else {
+                    this.setState(prev => ({
+                      ...prev,
+                      isVisible: true,
+                      dialogText: message.EMAIL_NOT_VARIFIED,
+                    }));
+                  }
+                })
               }
             }}>
               <Text style={style.bottomText}>Sign Up</Text>
             </TouchableOpacity>
           </View>
         </View>
+        <Dialog text={this.state.dialogText} isVisible={this.state.isVisible} onPress={() => {this.setState({isVisible: false})}} />
       </ImageBackground>
     );
   }

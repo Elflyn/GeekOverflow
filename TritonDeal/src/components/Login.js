@@ -4,6 +4,8 @@ import { Input, Icon } from 'react-native-elements';
 import OrBreak from './OrBreak';
 import GradientButton from '../components/GradientButton';
 import { firebase } from '@react-native-firebase/auth';
+import Dialog from './Dialog';
+import message from '../message';
 
 
 export default class Login extends React.Component {
@@ -11,40 +13,71 @@ export default class Login extends React.Component {
   state = {
     email: null,
     password: null,
-    unsubscribe: null
+    unsubscribe: null,
+    isVisible: false,
+    dialogText: '',
+    passwordError: '',
+    emailError: '',
   };
 
   handleLogin = () => {
     if (this.state.password && this.state.email) {
-      firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
-        if (!firebase.auth().currentUser.emailVerified) {
-          Alert.alert(
-            null,
-            'Your email address is not verified. Please check your email',
-            [{text: 'OK'}]
-          );
-        } else {
-          Alert.alert(
-            null,
-            'Login successful!',
-            [{text: 'OK'}]
-          );
-        }
-      }).catch(function (error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        if (errorCode) {
-          if (errorCode == 'auth/invalid-email') {
-            ToastAndroid.show('The email address is invalid.', ToastAndroid.SHORT);
-          } else if (errorCode == 'auth/user-disabled') {
-            ToastAndroid.show('Sorry, your account has been disabled.', ToastAndroid.SHORT);
-          } else if (errorCode == 'auth/user-not-found' || errorCode == 'auth/wrong-password') {
-            ToastAndroid.show('Wrong email/password combination.', ToastAndroid.SHORT);
+      if (!firebase.auth().currentUser) {
+        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
+          if (!firebase.auth().currentUser.emailVerified) {
+            this.setState(prev => ({
+              ...prev,
+              isVisible: true,
+              dialogText: message.EMAIL_NOT_VARIFIED,
+            }));
           } else {
-            ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+            this.setState(prev => ({
+              ...prev,
+              isVisible: true,
+              dialogText: message.LOGIN_SUCCESS,
+            }));
           }
-        }
-      });
+        }).catch((error) => {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          if (errorCode) {
+            if (errorCode == 'auth/invalid-email') {
+              this.setState(prev => ({ ...prev, passwordError: '', emailError: message.INVALID_EMAIL }))
+            } else if (errorCode == 'auth/user-disabled') {
+              this.setState(prev => ({
+                ...prev,
+                isVisible: true,
+                dialogText: message.ACCOUNT_DISABLED,
+              }));
+            } else if (errorCode === 'auth/user-not-found' || errorCode === 'auth/wrong-password') {
+              this.setState(prev => ({ ...prev, emailError: '', passwordError: message.WORNG_COMBINATION }))
+            } else {
+              this.setState(prev => ({
+                ...prev,
+                isVisible: true,
+                dialogText: errorMessage,
+              }));
+            }
+          }
+        });
+
+      } else {
+        firebase.auth().currentUser.reload().then(() => {
+          if (firebase.auth().currentUser.emailVerified) {
+            this.setState(prev => ({
+              ...prev,
+              isVisible: true,
+              dialogText: message.SIGNED_IN,
+            }));
+          } else {
+            this.setState(prev => ({
+              ...prev,
+              isVisible: true,
+              dialogText: message.EMAIL_NOT_VARIFIED,
+            }));
+          }
+        })
+      }
     }
   }
 
@@ -58,6 +91,8 @@ export default class Login extends React.Component {
           }
           keyboardType="email-address"
           onChangeText={(value) => this.setState({ email: value })}
+          errorStyle={style.errorStyle}
+          errorMessage={this.state.emailError}
         />
 
         <OrBreak />
@@ -75,13 +110,16 @@ export default class Login extends React.Component {
           }
           secureTextEntry={true}
           onChangeText={(value) => this.setState({ password: value })}
+          errorStyle={style.errorStyle}
+          errorMessage={this.state.passwordError}
         />
         <Text
           style={style.hyperlink}
           onPress={() => Linking.openURL('http://google.com')}>
           Forget password?
     </Text>
-        <GradientButton text={"Log in"} onPress = {this.handleLogin} />
+        <GradientButton text={"Log in"} onPress={this.handleLogin} />
+        <Dialog text={this.state.dialogText} isVisible={this.state.isVisible} onPress={() => { this.setState({ isVisible: false }) }} />
       </View>
     );
   }
@@ -112,4 +150,14 @@ const style = StyleSheet.create({
     paddingHorizontal: 38,
     textAlign: 'center',
   },
+
+  container: {
+    paddingHorizontal: 38,
+    textAlign: 'center',
+  },
+
+  errorStyle: {
+    color: 'red',
+    paddingLeft: 45,
+  }
 });
