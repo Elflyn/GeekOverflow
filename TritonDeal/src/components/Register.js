@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, Text, Linking, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
-import { Input, Icon } from 'react-native-elements';
+import { StyleSheet, View, Text, Linking, TouchableOpacity, ToastAndroid, Alert, ActivityIndicator } from 'react-native';
+import { Input, Icon, Overlay } from 'react-native-elements';
 import GradientButton from './GradientButton';
 import auth from '@react-native-firebase/auth';
 import { firebase } from '@react-native-firebase/auth';
@@ -9,10 +9,6 @@ import Dialog from './Dialog';
 import message from '../message';
 
 export default class Register extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {isVisible: false, text: "empty"};
-    }
 
   state = {
     email: 'example@ucsd.edu',
@@ -22,6 +18,7 @@ export default class Register extends React.Component {
     dialogText: '',
     passwordError: '',
     emailError: '',
+    finished: true,
   };
 
   componentDidMount = () => {
@@ -48,7 +45,7 @@ export default class Register extends React.Component {
         }
       }
     });
-    
+
     this.setState({ unsubscribe: unsub });
   };
 
@@ -58,12 +55,22 @@ export default class Register extends React.Component {
     }
   }
 
+  toggleActivityIndicator = () => {
+    this.setState({ finished: !this.state.finished });
+  };
+
   handleCreateUser = () => {
-    this.setState(prev => ({...prev,
+    this.toggleActivityIndicator();
+    this.setState(prev => ({
+      ...prev,
       dialogText: '',
       passwordError: '',
-      emailError: '',}));
-    firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).catch((error) => {
+      emailError: '',
+    }));
+    firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then(() => {
+      this.toggleActivityIndicator();
+    }).catch((error) => {
+      this.toggleActivityIndicator();
       var errorCode = error.code;
       var errorMessage = error.message;
       if (errorCode) {
@@ -99,6 +106,13 @@ export default class Register extends React.Component {
   render() {
     return (
       <View style={style.container}>
+        <Overlay
+          isVisible={!this.state.finished}
+          width="auto"
+          height="auto"
+        >
+          <ActivityIndicator size='large' color='#eabb33' />
+        </Overlay>
         <Input
           placeholder="Enter your email"
           leftIcon={
@@ -143,7 +157,7 @@ export default class Register extends React.Component {
           text={"Sign Up"}
           onPress={this.handleCreateUser}
         />
-        <Dialog isVisible={this.state.isVisible} text={this.state.dialogText} onPress={() => {this.setState({isVisible: false}); Actions.pop();}} />
+        <Dialog isVisible={this.state.isVisible} text={this.state.dialogText} onPress={() => { this.setState({ isVisible: false }); Actions.pop(); }} />
       </View>
     )
   };

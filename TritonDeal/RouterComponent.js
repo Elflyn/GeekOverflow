@@ -12,6 +12,7 @@ const RouterComponent = () => {
   return(
     <Router>
       <Stack key="root" headerLayoutPreset="center">
+        <Scene key="login" hideNavBar={true} component={LoginPage} />
         <Scene key="EditProfile"
                component={EditProfile}
                navigationBarStyle={style.nav}
@@ -19,7 +20,6 @@ const RouterComponent = () => {
                titleStyle={style.title}
                renderLeftButton={() => renderBackButton()}
         />
-        <Scene key="login" hideNavBar={true} component={LoginPage} />
         <Scene key="signup"
           component={SignupPage}
           navigationBarStyle={style.nav}
@@ -34,14 +34,12 @@ const RouterComponent = () => {
 };
 
 const renderBackButton = () => (
-  <TouchableOpacity onPress={() => Actions.pop()}>
-    <View style={{alignItems: 'center'}}>
-      <Icon
-        iconStyle={style.iconStyle}
-        name="keyboard-arrow-left"
-        type="MaterialIcons"
-      />
-    </View>
+  <TouchableOpacity
+      onPress={() => Actions.login()}
+  >
+      <View style={{ alignItems: 'center' }}>
+        <Icon  iconStyle={style.iconStyle} name="keyboard-arrow-left" type="MaterialIcons" />
+      </View>
   </TouchableOpacity>
 );
 

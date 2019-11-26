@@ -1,12 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, Text, Linking, ToastAndroid, Alert } from 'react-native';
-import { Input, Icon } from 'react-native-elements';
+import { StyleSheet, View, Text, Linking, ToastAndroid, ActivityIndicator } from 'react-native';
+import { Input, Icon, Overlay } from 'react-native-elements';
 import OrBreak from './OrBreak';
 import GradientButton from '../components/GradientButton';
 import { firebase } from '@react-native-firebase/auth';
 import Dialog from './Dialog';
 import message from '../message';
-
 
 export default class Login extends React.Component {
 
@@ -18,12 +17,15 @@ export default class Login extends React.Component {
     dialogText: '',
     passwordError: '',
     emailError: '',
+    finished: true
   };
 
   handleLogin = () => {
     if (this.state.password && this.state.email) {
       if (!firebase.auth().currentUser) {
+        this.toggleActivityIndicator();
         firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
+          this.toggleActivityIndicator();
           if (!firebase.auth().currentUser.emailVerified) {
             this.setState(prev => ({
               ...prev,
@@ -38,6 +40,7 @@ export default class Login extends React.Component {
             }));
           }
         }).catch((error) => {
+          this.toggleActivityIndicator();
           var errorCode = error.code;
           var errorMessage = error.message;
           if (errorCode) {
@@ -60,7 +63,6 @@ export default class Login extends React.Component {
             }
           }
         });
-
       } else {
         firebase.auth().currentUser.reload().then(() => {
           if (firebase.auth().currentUser.emailVerified) {
@@ -80,10 +82,21 @@ export default class Login extends React.Component {
       }
     }
   }
+ 
+  toggleActivityIndicator = () => {
+    this.setState({ finished: !this.state.finished });
+  };
 
   render() {
     return (
       <View style={style.loginContainer}>
+        <Overlay
+          isVisible={!this.state.finished}
+          width="auto"
+          height="auto"
+        >
+          <ActivityIndicator size='large' color='#eabb33' />
+        </Overlay>
         <Input
           placeholder="Email Address"
           leftIcon={
@@ -95,14 +108,6 @@ export default class Login extends React.Component {
           errorMessage={this.state.emailError}
         />
 
-        <OrBreak />
-
-        <Input
-          placeholder="Username"
-          leftIcon={
-            <Icon iconStyle={style.iconStyle} name="user" type="evilicon" />
-          }
-        />
         <Input
           placeholder="Password"
           leftIcon={
