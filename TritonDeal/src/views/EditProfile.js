@@ -1,19 +1,22 @@
 import React from 'react';
 import { StyleSheet, View, Text, Linking, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
-import { Input, Icon, ListItem } from 'react-native-elements';
+import {Input, Icon, ListItem, Button, Overlay} from 'react-native-elements';
 //import GradientButton from './GradientButton';
 //import auth from '@react-native-firebase/auth';
 //import { firebase } from '@react-native-firebase/auth';
 //import { Actions } from 'react-native-router-flux';
-//import Dialog from './Overlay';
-import InputBox from "../components/InputBox";
-import Dialog from "../components/Overlay";
 
 export default class EditProfile extends React.Component {
     constructor(props) {
         super(props);
         this.state = {isVisible: false, text: "empty"};
     }
+
+    toggleBox = () => {
+        this.setState({ isVisible: !this.state.isVisible });
+    };
+
+    //UPDATE new information to database
 
     render() {
         return (
@@ -23,7 +26,7 @@ export default class EditProfile extends React.Component {
                     bottomDivider
                     chevron
                     onPress={() => {
-                        this.setState({ isVisible: true, text:"Name"})
+                        this.setState({ isVisible: true, text: "Name"});
                     }}
                 />
                 <ListItem
@@ -31,7 +34,7 @@ export default class EditProfile extends React.Component {
                     bottomDivider
                     chevron
                     onPress={() => {
-                        this.setState({ isVisible: true, text:"Email"})
+                        this.setState({ isVisible: true, text:"Email"});
                     }}
                 />
                 <ListItem
@@ -39,7 +42,7 @@ export default class EditProfile extends React.Component {
                     bottomDivider
                     chevron
                     onPress={() => {
-                        this.setState({ isVisible: true, text:"Phone"})
+                        this.setState({ isVisible: true, text:"Phone"});
                     }}
                 />
                 <ListItem
@@ -47,10 +50,26 @@ export default class EditProfile extends React.Component {
                     bottomDivider
                     chevron
                     onPress={() => {
-                        this.setState({ isVisible: true, text:"Address"})
+                        this.setState({ isVisible: true, text:"Address"});
                     }}
                 />
-                <InputBox isVisible={this.state.isVisible} text={this.state.text}/>
+                <Overlay
+                    isVisible={this.state.isVisible}
+                    windowBackgroundColor="rgba(255, 255, 255, .8)"
+                    overlayBackgroundColor="white"
+                    width={350}
+                    height="auto"
+                >
+                    <ListItem
+                        title={this.state.text}
+                        titleStyle={style.titleStyle}
+                        leftElement={<Button title="cancel" type="clear" onPress={this.toggleBox}/>}
+                        rightElement={<Button title="Save" type="solid" onPress={this.toggleBox}/>}
+                    />
+                    <Input
+                        placeholder={this.state.text}
+                    />
+                </Overlay>
             </View>
         )
     };
@@ -83,6 +102,11 @@ const style = StyleSheet.create({
 
     container: {
         textAlign: 'center',
+    },
+
+    titleStyle:{
+        textAlign: 'center',
+        fontWeight: 'bold',
     }
 });
 
