@@ -12,5 +12,7 @@ export default {
   LINK_INVALID: 'Your verification link is invalid.',
   NO_USER: 'No user is currently signed in.',
   SIGNED_IN: 'You have already signed in',
-
+  BID_PROMPT:'You are about to join this bid. Once you placed a bid, it cannot cancel.If your holds the highest bid by the end, you automatically purchase this item.',
+  BUY_PROMPT:"You are about to purchase this item. Once purchased,you should contact seller for transaction and this item is marked sold.",
+  SUCCESS_PURCHASE:"You have purchased this item. Contact seller now."
 }
