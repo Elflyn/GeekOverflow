@@ -3,7 +3,6 @@ import {SearchBar} from 'react-native-elements'
 import {View,Text,FlatList,StyleSheet,SafeAreaView} from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
 import TopNavBar from '../components/TopNavBar'
-import BottomNavBar from '../components/BottomNavBar'
 
 const DATA = [{name:"Car", source :"http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg",
               tags:["car","used","bla"], description:"This is a 2017 used Infinity Q60, the condition is very new",price:10000,seller:"LL",timeleft:"4d 2h"},
