@@ -8,12 +8,12 @@ import {
   StatusBar,
 } from 'react-native';
 
-import LoginPage from './src/views/LoginPage';
+import HomePage from './src/views/HomePage';
 
 const App = () => {
   return (
     <View>
-      <LoginPage />
+      <HomePage />
     </View>
   );
 };
