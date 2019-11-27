@@ -1,1 +1,1 @@
-export const BACKGROUND = require('./background.jpg');
+export const HEADER = require('./LoginHeader.png');

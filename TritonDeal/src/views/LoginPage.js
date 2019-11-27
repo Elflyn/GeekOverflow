@@ -1,125 +1,173 @@
-import React, {Component} from 'react';
-import {Input, Icon, Button, Text as Header} from 'react-native-elements';
-import {StyleSheet, View, Text, ImageBackground, Linking} from 'react-native';
-import {BACKGROUND} from '../images';
+import React, { Component } from 'react';
+import { Input, Icon, Button, Overlay } from 'react-native-elements';
+import { Linking, ActivityIndicator } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  ImageBackground,
+  TouchableOpacity,
+  ToastAndroid,
+  Alert
+} from 'react-native';
+import { Actions} from 'react-native-router-flux';
+import { HEADER } from '../images';
+import Login from '../components/Login';
+import { firebase } from '@react-native-firebase/dynamic-links';
+import GradientButton from '../components/GradientButton';
+import Dialog from '../components/Dialog';
+import message from '../message';
+
+function parseURL(url) {
+  var regex = /[?&]([^=#]+)=([^&#]*)/g,
+    params = {},
+    match;
+  while (match = regex.exec(url)) {
+    params[match[1]] = match[2];
+  }
+  return params;
+}
 
 class LoginPage extends Component {
-  constructor() {
-    super();
-    this.state = {
-      navTab: 'LOGIN',
-    };
-    this.switchTab = this.switchTab.bind(this);
+  state = {
+    isVisible: false,
+    dialogText: '',
+    finished: true,
+  };
+
+  componentDidMount() {
+    Linking.getInitialURL().then(this.handeLaunchByUrl);
+    Linking.addEventListener("url", this.handeLaunchByUrl);
   }
 
-  switchTab = link => {
-    this.setState(() => ({navTab: link}));
+  componentWillUnmount() {
+    Linking.removeEventListener("url", this.handeLaunchByUrl);
+  }
+
+  handeLaunchByUrl = (event) => {
+    if (event) {
+      var deepLinkParams = parseURL(decodeURIComponent(parseURL(event.url).link));
+      var mode = deepLinkParams.mode;
+      var oobCode = deepLinkParams.oobCode;
+
+      switch (mode) {
+        case 'verifyEmail':
+          this.handleVerifyEmail(oobCode);
+          break;
+        default:
+          console.warn('Wrong action!');
+      }
+    }
+  };
+
+  handleVerifyEmail = (oobCode) => {
+    firebase.auth().applyActionCode(oobCode).then(() => {
+      Alert.alert(
+        null,
+        'Thank you. Your email address has been verified.',
+        [{text: 'OK'}],
+      );
+      firebase.auth().currentUser.reload();
+    }).catch(error => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      if (errorCode) {
+        if (errorCode == 'auth/expired-action-code') {
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: message.LINK_EXPIRE,
+          }));
+        } else if (errorCode == 'auth/invalid-action-code') {
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: message.LINK_INVALID,
+          }));
+        } else {
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: errorMessage,
+          }));
+        }
+      }
+    });
+  }
+
+  handleSignOut = () => {
+    firebase.auth().signOut().then(() => ToastAndroid.show('Successfully signed out.', ToastAndroid.SHORT)).catch(error => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      if (errorCode) {
+        if (errorCode == 'auth/no-current-user') {
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: message.NO_USER,
+          }));
+        } else {
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: errorMessage,
+          }));
+        }
+      }
+    });
   };
 
   render() {
     return (
-      <ImageBackground source={BACKGROUND} style={style.background}>
-        <Header h1>logo</Header>
-        <View>
-          <View style={style.formContainer}>
-            <Nav onPress={this.switchTab} active={this.state.navTab} />
-            <View style={style.form}>
-              {this.state.navTab === 'LOGIN' ? <Login /> : <Register />}
-            </View>
+      <ImageBackground source={HEADER} style={style.header}>
+        <Text style={style.text}>Triton Deal</Text>
+        <Login />
+        <GradientButton
+          text={"Sign Out"}
+          onPress={this.handleSignOut}
+        />
+        <View style={style.bottomTextContainer}>
+          <View style={style.bottomTextWrapper}>
+            <TouchableOpacity>
+              <Text style={style.bottomText} onPress={() => Actions.EditProfile()}>Skip Login</Text>
+            </TouchableOpacity>
           </View>
-          <ThirdPartyLogin />
+          <View tyle={style.bottomTextWrapper}>
+            <TouchableOpacity onPress={() => {
+              if (!firebase.auth().currentUser) {
+                Actions.signup('Triton Deal')
+              } else {
+                firebase.auth().currentUser.reload().then(() => {
+                  if (firebase.auth().currentUser.emailVerified) {
+                    this.setState(prev => ({
+                      ...prev,
+                      isVisible: true,
+                      dialogText: message.SIGNED_IN,
+                    }));
+                  } else {
+                    this.setState(prev => ({
+                      ...prev,
+                      isVisible: true,
+                      dialogText: message.EMAIL_NOT_VARIFIED,
+                    }));
+                  }
+                })
+              }
+            }}>
+              <Text style={style.bottomText}>Sign Up</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+        <Dialog text={this.state.dialogText} isVisible={this.state.isVisible} onPress={() => {this.setState({isVisible: false})}} />
       </ImageBackground>
     );
   }
 }
 
-const Login = () => (
-  <View>
-    <Input
-      placeholder="Email Address"
-      leftIcon={
-        <Icon iconStyle={style.iconStyle} name="envelope" type="evilicon" />
-      }
-    />
-    <View style={{flexDirection: 'row'}}>
-      <View style={style.line} />
-      <Text style={style.middleText}>OR</Text>
-      <View style={style.line} />
-    </View>
-    <Input
-      placeholder="Username"
-      leftIcon={
-        <Icon iconStyle={style.iconStyle} name="user" type="evilicon" />
-      }
-    />
-    <Input
-      placeholder="password"
-      leftIcon={
-        <Icon iconStyle={style.iconStyle} name="unlock" type="evilicon" />
-      }
-    />
-    <Text
-      style={style.hyperlink}
-      onPress={() => Linking.openURL('http://google.com')}>
-      Forget password?
-    </Text>
-    <Button buttonStyle={style.button} title="Login" />
-  </View>
-);
-
-const Register = () => (
-  <View>
-    <Input
-      placeholder="Enter your email"
-      leftIcon={
-        <Icon iconStyle={style.iconStyle} name="envelope" type="evilicon" />
-      }
-    />
-    <Input
-      placeholder="Enter your username"
-      leftIcon={
-        <Icon iconStyle={style.iconStyle} name="user" type="evilicon" />
-      }
-    />
-    <Input
-      placeholder="Password"
-      leftIcon={
-        <Icon iconStyle={style.iconStyle} name="lock" type="evilicon" />
-      }
-    />
-    <Input
-      placeholder="Confirm Password"
-      leftIcon={
-        <Icon iconStyle={style.iconStyle} name="lock" type="evilicon" />
-      }
-    />
-    <Button buttonStyle={style.button} title="Sign Up" />
-  </View>
-);
-
-const Nav = ({onPress, active}) => (
-  <View style={style.nav}>
-    <Button
-      onPress={() => onPress('LOGIN')}
-      type="clear"
-      buttonStyle={style.navTab}
-      titleStyle={active === 'LOGIN' ? style.activeTab : style.disabledTab}
-      title="LOGIN"
-    />
-    <Button
-      onPress={() => onPress('REG')}
-      buttonStyle={style.navTab}
-      titleStyle={active === 'REG' ? style.activeTab : style.disabledTab}
-      type="clear"
-      title="SIGN UP"
-    />
-  </View>
-);
 
 const ThirdPartyLogin = () => (
   <View>
-    <View style={{flexDirection: 'row'}}>
+    <View style={{ flexDirection: 'row' }}>
       <View style={style.line} />
       <Text style={style.middleText}>Or connect with</Text>
       <View style={style.line} />
@@ -132,47 +180,21 @@ const ThirdPartyLogin = () => (
 );
 
 const style = StyleSheet.create({
-  background: {
+  header: {
     height: '100%',
-    alignItems: 'center',
     width: '100%',
   },
 
-  button: {
-    marginVertical: 30,
-    width: 150,
-    alignSelf: 'center',
-    backgroundColor: '#1d3e53',
-  },
-
-  buttonContainer: {
-    color: '#1d3e53',
-  },
-
-  navTab: {
-    width: 175,
-  },
-
-  activeTab: {
-    fontSize: 32,
-    fontFamily: 'Roboto-Thin',
-    color: '#f8f8f8',
-  },
-
-  disabledTab: {
-    fontFamily: 'Roboto-Thin',
-    fontSize: 32,
-    color: '#ececec',
-    opacity: 0.3,
+  text: {
+    textAlign: 'center',
+    color: '#006EA6',
+    fontWeight: 'bold',
+    fontSize: 35,
+    marginTop: 250,
   },
 
   centerText: {
     textAlign: 'center',
-  },
-
-  nav: {
-    flexDirection: 'row',
-    justifyContent: 'center',
   },
 
   formContainer: {
@@ -193,36 +215,21 @@ const style = StyleSheet.create({
     textAlign: 'center',
   },
 
-  iconContainer: {
+  bottomTextContainer: {
+    marginHorizontal: 15,
     flexDirection: 'row',
-    justifyContent: 'center',
+    marginTop: 25,
   },
 
-  line: {
-    backgroundColor: 'black',
-    height: 1,
-    flex: 1,
-    paddingHorizontal: 1,
-    alignSelf: 'center',
-    marginVertical: 15,
-  },
-
-  middleText: {
-    paddingHorizontal: 5,
-    alignSelf: 'center',
-    fontSize: 20,
-  },
-
-  iconStyle: {
-    marginRight: 15,
-  },
-
-  hyperlink: {
-    color: 'grey',
+  bottomText: {
+    color: '#94B4AF',
     textDecorationLine: 'underline',
-    textAlign: 'right',
     fontSize: 18,
     paddingRight: 10,
+  },
+
+  bottomTextWrapper: {
+    flex: 1,
   },
 });
 

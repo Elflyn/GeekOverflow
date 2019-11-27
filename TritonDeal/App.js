@@ -1,21 +1,8 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
-
-import HomePage from './src/views/HomePage';
+import RouterComponent from './RouterComponent';
 
 const App = () => {
-  return (
-    <View>
-      <HomePage />
-    </View>
-  );
+  return <RouterComponent />;
 };
 
 export default App;

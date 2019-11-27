@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "376517016642",
+    "firebase_url": "https://tritondeal.firebaseio.com",
+    "project_id": "tritondeal",
+    "storage_bucket": "tritondeal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:376517016642:android:e86d95c91fe620a59141db",
+        "android_client_info": {
+          "package_name": "com.tritondeal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "376517016642-s1sjd3g11j18hscdn2io44ve1185ln7h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tritondeal",
+            "certificate_hash": "72af97a22b64baa428320b940cc13f869da43fdc"
+          }
+        },
+        {
+          "client_id": "376517016642-mjcf6qnf9rbni04j5rb3ahmtkeho9j8c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3i8vZLjv7qjFdgMXxtLMhg60Z0m1NiN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "376517016642-mjcf6qnf9rbni04j5rb3ahmtkeho9j8c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
