@@ -12,6 +12,7 @@ const RouterComponent = () => {
   return(
     <Router>
       <Stack key="root" headerLayoutPreset="center">
+
         <Tabs
             key="nav"
             tabBarStyle={{ backgroundColor: '#FFFFFF' }}
@@ -21,15 +22,6 @@ const RouterComponent = () => {
             inactiveTintColor='grey'
         >
           <Scene key="home" iconName={'home'} icon={TabIcon}>
-            <Scene
-                key="editProfile"
-                component={EditProfile}
-                navigationBarStyle={style.nav}
-                title="Edit Profile"
-                titleStyle={style.title}
-            />
-          </Scene>
-          <Scene key="account" iconName={'account'} icon={TabIcon}>
             <Scene
               key="sigup"
               component={SignupPage}
@@ -45,6 +37,17 @@ const RouterComponent = () => {
               navigationBarStyle={style.nav}
               title="Register"
               titleStyle={style.title}
+            />
+          </Scene>
+          <Scene key="account" iconName={'account'} icon={TabIcon}>
+            <Scene key="profile" component={Profile} hideNavBar />
+            <Scene
+                key="editProfile"
+                component={EditProfile}
+                navigationBarStyle={style.nav}
+                title="Edit Profile"
+                titleStyle={style.title}
+                renderLeftButton={() => renderBackButton()}
             />
           </Scene>
         </Tabs>
@@ -64,7 +67,7 @@ const RouterComponent = () => {
 
 const renderBackButton = () => (
   <TouchableOpacity
-      onPress={() => Actions.login()}
+      onPress={() => Actions.pop()}
   >
       <View style={{ alignItems: 'center' }}>
         <Icon  iconStyle={style.iconStyle} name="keyboard-arrow-left" type="MaterialIcons" />
@@ -92,8 +95,10 @@ const style = StyleSheet.create({
     color: 'white',
     flex: 1,
   },
+  
   iconStyle: {
     color: 'white',
+    marginLeft: 10,
   },
 });
 
