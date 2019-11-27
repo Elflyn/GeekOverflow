@@ -1,39 +1,26 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, View, Text} from 'react-native';
-import {Scene, Router, Stack, Actions} from 'react-native-router-flux';
+import {Scene, Router, Stack, Actions, Tabs} from 'react-native-router-flux';
 import LoginPage from './src/views/LoginPage';
 import SignupPage from './src/views/SignupPage';
 import Profile from './src/views/Profile';
 import {Icon} from 'react-native-elements';
-import Dialog from './src/components/Overlay';
 import EditProfile from './src/views/EditProfile';
 
 const RouterComponent = () => {
-  const TabIcon = ({ selected, title }) => {
-    return (
-        <Text style={{color: selected ? 'red' :'black'}}>{title}</Text>
-    );
-  }
 
   return(
     <Router>
       <Stack key="root" headerLayoutPreset="center">
-        <Scene
-            key="tabbar"
-            tabs={true}
+        <Tabs
+            key="nav"
             tabBarStyle={{ backgroundColor: '#FFFFFF' }}
-            hideNavBar={true}
+            hideNavBar
+            showLabel={false}
+            activeTintColor ="#016C9A"
+            inactiveTintColor='grey'
         >
-          <Scene key="osu" title="HOME" icon={TabIcon}>
-            <Scene
-                key="sigup"
-                component={SignupPage}
-                navigationBarStyle={style.nav}
-                title="Register"
-                titleStyle={style.title}
-            />
-          </Scene>
-          <Scene key="um" title="Profile" icon={TabIcon}>
+          <Scene key="home" iconName={'home'} icon={TabIcon}>
             <Scene
                 key="editProfile"
                 component={EditProfile}
@@ -42,7 +29,25 @@ const RouterComponent = () => {
                 titleStyle={style.title}
             />
           </Scene>
-        </Scene>
+          <Scene key="account" iconName={'account'} icon={TabIcon}>
+            <Scene
+              key="sigup"
+              component={SignupPage}
+              navigationBarStyle={style.nav}
+              title="Register"
+              titleStyle={style.title}
+            />
+          </Scene>
+          <Scene key="post" iconName={'comment-plus-outline'} icon={TabIcon}>
+            <Scene
+              key="sigup"
+              component={SignupPage}
+              navigationBarStyle={style.nav}
+              title="Register"
+              titleStyle={style.title}
+            />
+          </Scene>
+        </Tabs>
 
         <Scene key="login" hideNavBar={true} component={LoginPage} />
         <Scene key="signup"
@@ -66,6 +71,16 @@ const renderBackButton = () => (
       </View>
   </TouchableOpacity>
 );
+
+class TabIcon extends React.Component {
+  render () {
+    const color = this.props.focused
+        ? this.props.activeTintColor 
+        : this.props.inactiveTintColor
+
+    return <Icon color={color} type="material-community" name={this.props.iconName} />
+  }
+}
 
 const style = StyleSheet.create({
   nav: {
