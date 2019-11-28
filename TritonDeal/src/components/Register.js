@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, Linking, TouchableOpacity, ToastAndroid, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, Linking, TouchableOpacity, ToastAndroid, Alert, ActivityIndicator, KeyboardAvoidingView } from 'react-native';
 import { Input, Icon, Overlay } from 'react-native-elements';
 import GradientButton from './GradientButton';
 import auth from '@react-native-firebase/auth';
@@ -7,18 +7,26 @@ import { firebase } from '@react-native-firebase/auth';
 import { Actions } from 'react-native-router-flux';
 import Dialog from './Dialog';
 import message from '../message';
+import { tsParameterProperty } from '@babel/types';
 
 export default class Register extends React.Component {
 
   state = {
-    email: 'example@ucsd.edu',
-    password: 'password',
+    email: null,
+    password: null,
+    confirmpassword: null,
+    username: null,
     unsubscribe: null,
     isVisible: false,
     dialogText: '',
     passwordError: '',
     emailError: '',
+    usernameError: '',
+    confirmError: '',
     finished: true,
+    focusedEmail: false,
+    focusedConfirm: false,
+    emailMatch: false
   };
 
   componentDidMount = () => {
@@ -36,6 +44,7 @@ export default class Register extends React.Component {
             dynamicLinkDomain: "tritondeal.page.link"
           };
           user.sendEmailVerification(actionCodeSettings).then(() => {
+            this.toggleActivityIndicator();
             this.setState(prev => ({
               ...prev,
               isVisible: true,
@@ -50,6 +59,9 @@ export default class Register extends React.Component {
   };
 
   componentWillUnmount = () => {
+    if (!this.state.finished) {
+      this.toggleActivityIndicator();
+    }
     if (this.state.unsubscribe) {
       this.state.unsubscribe();
     }
@@ -67,52 +79,103 @@ export default class Register extends React.Component {
   };
 
   handleCreateUser = () => {
-    this.toggleActivityIndicator();
-    this.setState(prev => ({
-      ...prev,
-      dialogText: '',
-      passwordError: '',
-      emailError: '',
-    }));
-    firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then(() => {
-      this.toggleActivityIndicator();
-    }).catch((error) => {
-      this.toggleActivityIndicator();
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      if (errorCode) {
-        if (errorCode == 'auth/weak-password') {
-          this.setState(prev => ({
-            ...prev,
-            emailError: '',
-            passwordError: message.WEAK_PASSWORD,
-          }));
-        } else if (errorCode == 'auth/invalid-email') {
-          this.setState(prev => ({
-            ...prev,
-            passwordError: '',
-            emailError: message.INVALID_EMAIL,
-          }));
-        } else if (errorCode == 'auth/email-already-in-use') {
-          this.setState(prev => ({
-            ...prev,
-            passwordError: '',
-            emailError: message.EMAIL_IN_USE,
-          }));
-        } else {
-          this.setState(prev => ({
-            ...prev,
-            isVisible: true,
-            dialogText: errorMessage,
-          }));
-        }
+    var emailValid = false;
+    if (this.state.email) {
+      emailValid = emailReg.test(this.state.email);
+      if (emailValid == true) {
+        this.setState(prev => ({
+          ...prev,
+          emailMatch: true,
+          emailError: '',
+        }));
+      } else {
+        this.setState(prev => ({
+          ...prev,
+          emailMatch: false,
+          emailError: 'Please enter a valid email address',
+        }));
       }
-    })
+    }
+    if (this.state.password) {
+      this.setState(prev => ({
+        ...prev,
+        passwordError: '',
+      }));
+    }
+    if (this.state.password === this.state.confirmpassword) {
+      this.setState(prev => ({
+        ...prev,
+        confirmError: '',
+      }));
+    }
+    if (emailValid && this.state.password === this.state.confirmpassword && this.state.password && this.state.username) {
+      this.toggleActivityIndicator();
+      firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then(() => {
+        firebase.auth().currentUser.updateProfile({
+          displayName: this.state.username,
+        }).then(() => firebase.auth().currentUser.reload());
+      }).catch((error) => {
+        this.toggleActivityIndicator();
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        if (errorCode) {
+          if (errorCode == 'auth/weak-password') {
+            this.setState(prev => ({
+              ...prev,
+              emailError: '',
+              passwordError: message.WEAK_PASSWORD,
+            }));
+          } else if (errorCode == 'auth/invalid-email') {
+            this.setState(prev => ({
+              ...prev,
+              passwordError: '',
+              emailError: message.INVALID_EMAIL,
+            }));
+          } else if (errorCode == 'auth/email-already-in-use') {
+            this.setState(prev => ({
+              ...prev,
+              passwordError: '',
+              emailError: message.EMAIL_IN_USE,
+            }));
+          } else {
+            this.setState(prev => ({
+              ...prev,
+              isVisible: true,
+              dialogText: errorMessage,
+            }));
+          }
+        }
+      })
+    }
+    if (!emailValid) {
+      this.setState(prev => ({
+        ...prev,
+        emailError: 'Please enter a valid email address',
+      }));
+    }
+    if (!this.state.username) {
+      this.setState(prev => ({
+        ...prev,
+        usernameError: 'Please enter a username',
+      }));
+    }
+    if (!this.state.password) {
+      this.setState(prev => ({
+        ...prev,
+        passwordError: 'Please enter a password'
+      }));
+    }
+    if (!(this.state.password === this.state.confirmpassword)) {
+      this.setState(prev => ({
+        ...prev,
+        confirmError: 'Password doesn\'t match'
+      }));
+    }
   };
 
   render() {
     return (
-      <View style={style.container}>
+      <KeyboardAvoidingView style={style.container}>
         <Overlay
           isVisible={!this.state.finished}
           width="auto"
@@ -126,15 +189,26 @@ export default class Register extends React.Component {
             <Icon iconStyle={style.iconStyle} name="envelope" type="evilicon" />
           }
           keyboardType="email-address"
-          onChangeText={(value) => this.setState({ email: value })}
+          onChangeText={(value) => this.setState({ email: value, emailError: '' })}
           errorStyle={style.errorStyle}
           errorMessage={this.state.emailError}
+          onEndEditing={() => {
+            var ifEmailMatch = emailReg.test(this.state.email)
+            this.setState({ emailMatch: ifEmailMatch, focusedEmail: true })
+            if (ifEmailMatch) {
+              this.setState({ emailError: '' });
+            }
+          }}
+          inputContainerStyle={this.state.emailMatch || !this.state.focusedEmail ? null : { borderBottomColor: 'red' }}
         />
         <Input
           placeholder="Enter your username"
           leftIcon={
             <Icon iconStyle={style.iconStyle} name="user" type="evilicon" />
           }
+          onChangeText={(value) => this.setState({ username: value, usernameError: '' })}
+          errorStyle={style.errorStyle}
+          errorMessage={this.state.usernameError}
         />
         <Input
           placeholder="Password"
@@ -142,7 +216,7 @@ export default class Register extends React.Component {
             <Icon iconStyle={style.iconStyle} name="lock" type="evilicon" />
           }
           secureTextEntry={true}
-          onChangeText={(value) => this.setState({ password: value })}
+          onChangeText={(value) => this.setState({ password: value, passwordError: '' })}
           errorStyle={style.errorStyle}
           errorMessage={this.state.passwordError}
         />
@@ -151,24 +225,24 @@ export default class Register extends React.Component {
           leftIcon={
             <Icon iconStyle={style.iconStyle} name="lock" type="evilicon" />
           }
+          errorStyle={style.errorStyle}
+          errorMessage={this.state.confirmError}
+          onChangeText={(value) => this.setState({ confirmpassword: value, confirmError: '' })}
           secureTextEntry={true}
-        />
-        <Input
-          placeholder="Phone number"
-          leftIcon={
-            <Icon iconStyle={style.iconStyle} name="phone-android" type="MaterialIcons" />
-          }
-          keyboardType="phone-pad"
+          onFocus={() => this.setState({ focusedConfirm: true })}
+          inputContainerStyle={this.state.password == this.state.confirmpassword || !this.state.focusedConfirm ? null : { borderBottomColor: 'red' }}
         />
         <GradientButton
           text={"Sign Up"}
           onPress={this.handleCreateUser}
         />
         <Dialog isVisible={this.state.isVisible} text={this.state.dialogText} onPress={this.onPressOK} />
-      </View>
+      </KeyboardAvoidingView>
     )
   };
 };
+
+const emailReg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
 
 const style = StyleSheet.create({
   iconContainer: {
@@ -197,7 +271,7 @@ const style = StyleSheet.create({
   errorStyle: {
     color: 'red',
     paddingLeft: 45,
-    fontSize: 18,
+    fontSize: 15,
   }
 
 });;

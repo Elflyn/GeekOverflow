@@ -60,7 +60,9 @@ export default class RouterComponent extends React.Component {
         'Thank you. Your email address has been verified.',
         [{ text: 'OK'}],
       );
-      firebase.auth().currentUser.reload();
+      firebase.auth().currentUser.reload().then(() => {
+        Actions.refresh();
+      });
     }).catch(error => {
       var errorCode = error.code;
       var errorMessage = error.message;
