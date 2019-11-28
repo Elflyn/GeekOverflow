@@ -76,7 +76,7 @@ export default class UserProfileView extends Component {
           <View>
               <TouchableOpacity style={styles.menuButton}><Text style={styles.menuButtonText}>Upload</Text></TouchableOpacity>
               <TouchableOpacity style={styles.menuButton}><Text style={styles.menuButtonText}>New Photo</Text></TouchableOpacity>
-              <TouchableOpacity style={styles.menuButton}><Text style={styles.menuButtonText}>Cancel</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => this.RBSheet.close()}style={styles.menuButton}><Text style={styles.menuButtonText}>Cancel</Text></TouchableOpacity>
           </View>      
       </RBSheet>
       </View>
