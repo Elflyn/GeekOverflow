@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, ToastAndroid, StatusBar} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity, ToastAndroid, StatusBar} from 'react-native';
 import {Icon, Button, Avatar} from 'react-native-elements';
 import {InfoList, ChoiceList} from '../components/ProfileList';
 import GradientButton from '../components/GradientButton';
 import {Actions} from 'react-native-router-flux';
 import { firebase } from '@react-native-firebase/auth';
 import message from '../message';
+import RBSheet from "react-native-raw-bottom-sheet";
 
 export default class UserProfileView extends Component {
 
@@ -47,7 +48,7 @@ export default class UserProfileView extends Component {
               icon={{name: 'user', type: 'font-awesome'}} 
               containerStyle={styles.avatar}
               showEditButton
-              /*onEditPress={} */
+              onEditPress={() => this.RBSheet.open() }
             />
           </View>
         </View>
@@ -67,6 +68,17 @@ export default class UserProfileView extends Component {
             onPress={this.handleSignOut}
           />
         </View>
+        <RBSheet
+          ref={ref => this.RBSheet = ref}
+          height={150}
+          duration={250}
+          >
+          <View>
+              <TouchableOpacity style={styles.menuButton}><Text style={styles.menuButtonText}>Upload</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.menuButton}><Text style={styles.menuButtonText}>New Photo</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.menuButton}><Text style={styles.menuButtonText}>Cancel</Text></TouchableOpacity>
+          </View>      
+      </RBSheet>
       </View>
     );
   }
@@ -110,5 +122,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'white',
     marginBottom: 5,
+  },
+
+  menuButton: {
+    width: "100%",
+    borderBottomColor: 'black',
+    paddingVertical: 10,
+  },
+
+  menuButtonText: {
+      textAlign: 'center',
+      fontSize: 20,
   },
 });

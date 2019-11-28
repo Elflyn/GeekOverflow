@@ -7,6 +7,7 @@ import { firebase } from '@react-native-firebase/auth';
 import Dialog from './Dialog';
 import message from '../message';
 import { Actions } from 'react-native-router-flux';
+import { Action } from 'rxjs/internal/scheduler/Action';
 
 export default class Login extends React.Component {
 
@@ -40,12 +41,13 @@ export default class Login extends React.Component {
               isVisible: true,
               dialogText: message.EMAIL_NOT_VARIFIED,
             }));
-          } else {
-            this.setState(prev => ({
-              ...prev,
-              isVisible: true,
-              dialogText: message.LOGIN_SUCCESS,
-            }));
+          } else {    
+            // this.setState(prev => ({
+            //   ...prev,
+            //   isVisible: true,
+            //   dialogText: message.LOGIN_SUCCESS,
+            // }));
+            Actions._account();
           }
         }).catch((error) => {
           this.toggleActivityIndicator();
