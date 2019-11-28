@@ -5,6 +5,7 @@ import LoginPage from './src/views/LoginPage';
 import SignupPage from './src/views/SignupPage';
 import SplashScreen from './src/views/SplashScreen'
 import Placeholder from './src/views/Placeholder'
+import ChatList from './src/views/ChatList'
 import Profile from './src/views/Profile';
 import { Icon } from 'react-native-elements';
 import EditProfile from './src/views/EditProfile';
@@ -133,10 +134,19 @@ export default class RouterComponent extends React.Component {
                   titleStyle={style.title}
                 />
               </Scene>
-              <Scene key="_message" iconName={'comment-plus-outline'} icon={TabIcon}>
+              <Scene key="_post" iconName={'plus-box-outline'} icon={TabIcon}>
+                <Scene
+                  key="post"
+                  component={Placeholder}
+                  navigationBarStyle={style.nav}
+                  title="Register"
+                  titleStyle={style.title}
+                />
+              </Scene>
+              <Scene key="_message" iconName={'message-text-outline'} icon={TabIcon}>
                 <Scene
                   key="message"
-                  component={Placeholder}
+                  component={ChatList}
                   navigationBarStyle={style.nav}
                   title="Register"
                   titleStyle={style.title}
