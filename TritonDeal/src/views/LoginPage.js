@@ -8,7 +8,8 @@ import {
   ImageBackground,
   TouchableOpacity,
   ToastAndroid,
-  Alert
+  Alert,
+  StatusBar
 } from 'react-native';
 import { Actions, ActionConst } from 'react-native-router-flux';
 import { HEADER } from '../images';
@@ -85,6 +86,7 @@ const ThirdPartyLogin = () => (
 
 const style = StyleSheet.create({
   header: {
+    paddingTop: StatusBar.currentHeight,
     height: '100%',
     width: '100%',
   },

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, ToastAndroid} from 'react-native';
+import {StyleSheet, Text, View, Image, ToastAndroid, StatusBar} from 'react-native';
 import {Icon, Button, Avatar} from 'react-native-elements';
 import {InfoList, ChoiceList} from '../components/ProfileList';
 import GradientButton from '../components/GradientButton';
@@ -89,6 +89,7 @@ const editButtonStyle = StyleSheet.create({
 
 const styles = StyleSheet.create({
   header: {
+    paddingTop: StatusBar.currentHeight,
     backgroundColor: '#00395B',
   },
 

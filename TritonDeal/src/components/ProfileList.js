@@ -1,6 +1,7 @@
-import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import React, { useState } from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, ToastAndroid} from 'react-native';
 import {Icon} from 'react-native-elements';
+import { firebase } from '@react-native-firebase/auth';
 
 const listStyle = StyleSheet.create({
   background: {
@@ -16,7 +17,7 @@ const listStyle = StyleSheet.create({
     marginLeft: 15,
     height: '100%',
     borderBottomColor: '#f2eee5',
-    borderBottomWidth: 1,
+
     width: '100%',
     paddingVertical: 15,
   },
@@ -46,9 +47,9 @@ const ProfileList = ({touchable, list}) => {
       {list.map((item, i) => (
         <View style={listStyle.rowContainer}>
           <Icon iconStyle={item.style} name={item.icon} type={item.type} />
-          <View style={listStyle.textContainer}>
+          <View style={[listStyle.textContainer, {borderBottomWidth: item.last ? 0 : 1}]}>
             {!touchable ? (
-              <Text style={listStyle.text}>{item.title}</Text>
+              <Text style={[listStyle.text, {color: item.verified ? 'black' : 'red'}]}>{item.title}</Text>
             ) : (
               <TouchableOpacity style={listStyle.button}>
                 <Text style={listStyle.text}>{item.title}</Text>
@@ -74,34 +75,19 @@ const info = [
     style: {
       ...listStyle.iconStyle,
     },
+    verified: true
   },
   {
-    title: 'email',
+    title: 'Email',
     type: 'evilicon',
     icon: 'envelope',
     style: {
       color: '#C57655',
       ...listStyle.iconStyle,
     },
-  },
-  {
-    title: 'phone',
-    icon: 'phone',
-    type: 'simple-line-icon',
-    style: {
-      color: '#c9c9c9',
-      ...listStyle.iconStyle,
-    },
-  },
-  {
-    title: 'Address',
-    type: 'evilicon',
-    icon: 'location',
-    style: {
-      ...listStyle.iconStyle,
-      color: '#1A789F',
-    },
-  },
+    last: true,
+    verified: false
+  }
 ];
 
 const choice = [
@@ -131,11 +117,36 @@ const choice = [
       ...listStyle.iconStyle,
       color: 'black',
     },
+    last: true
   },
 ];
 
-const InfoList = () => <ProfileList list={info} />;
+export class InfoList extends React.Component {
+  
+  constructor(props) {
+    super(props);
+    this.updateUserInfo();
+  }
+
+  componentWillUpdate = () => {
+    this.updateUserInfo();
+  }
+
+  updateUserInfo = () => {
+    var user = firebase.auth().currentUser;
+    info[0].title = user.displayName;
+    info[1].title = user.email;
+    info[1].verified = user.emailVerified;
+  }
+
+  render() {
+    return (
+      <ProfileList list={info} />
+    );
+  }
+}
+
 const ChoiceList = () => <ProfileList touchable={true} list={choice} />;
 
 export default ProfileList;
-export {InfoList, ChoiceList};
+export {ChoiceList};

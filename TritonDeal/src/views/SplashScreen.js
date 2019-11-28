@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ImageBackground } from 'react-native'
+import { View, StyleSheet, ImageBackground, StatusBar } from 'react-native'
 import { firebase } from '@react-native-firebase/auth';
 import { SPLASH } from '../images';
 import { Actions, ActionConst } from 'react-native-router-flux';
@@ -21,6 +21,11 @@ export default class SplashScreen extends React.Component {
   render() {
     return (
       <View style={style.container}>
+        <StatusBar
+          translucent
+          backgroundColor="transparent"
+          animated
+        />
         <ImageBackground source={SPLASH} style={style.backgroundImage} />
       </View>
     )

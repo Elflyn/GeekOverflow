@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View, BackHandler, ToastAndroid, Alert, Linking } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, BackHandler, ToastAndroid, Alert, Linking, StatusBar } from 'react-native';
 import { Scene, Router, Stack, Actions, Tabs, ActionConst } from 'react-native-router-flux';
 import LoginPage from './src/views/LoginPage';
 import SignupPage from './src/views/SignupPage';
@@ -141,7 +141,7 @@ export default class RouterComponent extends React.Component {
                 />
               </Scene>
               <Scene key="_account" iconName={'account'} icon={TabIcon}>
-                <Scene key="profile" component={Profile} hideNavBar />
+                <Scene key="profile" component={Profile} hideNavBar onEnter={() => {Actions.refresh()}}/>
               </Scene>
             </Tabs>
           </Scene>
@@ -211,11 +211,14 @@ class TabIcon extends React.Component {
 
 const style = StyleSheet.create({
   nav: {
+    height: StatusBar.currentHeight + 56,
+    paddingTop: StatusBar.currentHeight,
     backgroundColor: '#016C9A',
     textAlign: 'center',
   },
 
   title: {
+    top: 0,
     color: 'white',
     flex: 1,
   },

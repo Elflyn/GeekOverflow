@@ -74,6 +74,7 @@ export default class EditProfile extends React.Component {
     firebase.auth().currentUser.updateProfile({ displayName: this.state.info }).then(() => {
       firebase.auth().currentUser.reload().then(() => {
         this.toggleActivityIndicator();
+        ToastAndroid.show('Successfully changed display name.', ToastAndroid.SHORT)
       }).catch(this.handleError);
     }).catch(this.handleError);
   };
