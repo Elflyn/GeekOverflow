@@ -42,12 +42,11 @@ export default class Login extends React.Component {
               dialogText: message.EMAIL_NOT_VARIFIED,
             }));
           } else {    
-            // this.setState(prev => ({
-            //   ...prev,
-            //   isVisible: true,
-            //   dialogText: message.LOGIN_SUCCESS,
-            // }));
-            Actions._account();
+            this.setState(prev => ({
+              ...prev,
+              isVisible: true,
+              dialogText: message.LOGIN_SUCCESS,
+            }));
           }
         }).catch((error) => {
           this.toggleActivityIndicator();
