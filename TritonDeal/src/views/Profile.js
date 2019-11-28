@@ -1,10 +1,39 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image} from 'react-native';
+import {StyleSheet, Text, View, Image, ToastAndroid} from 'react-native';
 import {Icon, Button, Avatar} from 'react-native-elements';
 import {InfoList, ChoiceList} from '../components/ProfileList';
+import GradientButton from '../components/GradientButton';
 import {Actions} from 'react-native-router-flux';
+import { firebase } from '@react-native-firebase/auth';
+import message from '../message';
 
 export default class UserProfileView extends Component {
+
+  handleSignOut = () => {
+    firebase.auth().signOut().then(() => {
+      ToastAndroid.show('Successfully signed out.', ToastAndroid.SHORT)
+      Actions.root();
+    }).catch(error => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      if (errorCode) {
+        if (errorCode == 'auth/no-current-user') {
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: message.NO_USER,
+          }));
+        } else {
+          this.setState(prev => ({
+            ...prev,
+            isVisible: true,
+            dialogText: errorMessage,
+          }));
+        }
+      }
+    });
+  };
+
   render() {
     return (
       <View style={styles.container}>
@@ -33,6 +62,10 @@ export default class UserProfileView extends Component {
         <View style={styles.background}>
           <InfoList />
           <ChoiceList />
+          <GradientButton
+            text={"Sign Out"}
+            onPress={this.handleSignOut}
+          />
         </View>
       </View>
     );

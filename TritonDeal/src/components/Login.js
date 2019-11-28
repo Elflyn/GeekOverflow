@@ -6,6 +6,7 @@ import GradientButton from '../components/GradientButton';
 import { firebase } from '@react-native-firebase/auth';
 import Dialog from './Dialog';
 import message from '../message';
+import { Actions } from 'react-native-router-flux';
 
 export default class Login extends React.Component {
 
@@ -17,8 +18,15 @@ export default class Login extends React.Component {
     dialogText: '',
     passwordError: '',
     emailError: '',
-    finished: true
+    finished: true,
   };
+
+  onPressOK = () => {
+    this.setState({ isVisible: false })
+    if (this.state.dialogText === message.LOGIN_SUCCESS) {
+      Actions.root();
+    }
+  }
 
   handleLogin = () => {
     if (this.state.password && this.state.email) {
@@ -124,7 +132,7 @@ export default class Login extends React.Component {
           Forget password?
     </Text>
         <GradientButton text={"Log in"} onPress={this.handleLogin} />
-        <Dialog text={this.state.dialogText} isVisible={this.state.isVisible} onPress={() => { this.setState({ isVisible: false }) }} />
+        <Dialog text={this.state.dialogText} isVisible={this.state.isVisible} onPress={this.onPressOK} />
       </View>
     );
   }

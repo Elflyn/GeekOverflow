@@ -55,6 +55,13 @@ export default class Register extends React.Component {
     }
   }
 
+  onPressOK = () => {
+    this.setState({ isVisible: false })
+    if (this.state.dialogText === message.VALIDATE_EAMIL) {
+      Actions.root();
+    }
+  }
+
   toggleActivityIndicator = () => {
     this.setState({ finished: !this.state.finished });
   };
@@ -157,7 +164,7 @@ export default class Register extends React.Component {
           text={"Sign Up"}
           onPress={this.handleCreateUser}
         />
-        <Dialog isVisible={this.state.isVisible} text={this.state.dialogText} onPress={() => { this.setState({ isVisible: false }); Actions.pop(); }} />
+        <Dialog isVisible={this.state.isVisible} text={this.state.dialogText} onPress={this.onPressOK} />
       </View>
     )
   };

@@ -10,23 +10,13 @@ import {
   ToastAndroid,
   Alert
 } from 'react-native';
-import { Actions} from 'react-native-router-flux';
+import { Actions, ActionConst } from 'react-native-router-flux';
 import { HEADER } from '../images';
 import Login from '../components/Login';
 import { firebase } from '@react-native-firebase/dynamic-links';
 import GradientButton from '../components/GradientButton';
 import Dialog from '../components/Dialog';
 import message from '../message';
-
-function parseURL(url) {
-  var regex = /[?&]([^=#]+)=([^&#]*)/g,
-    params = {},
-    match;
-  while (match = regex.exec(url)) {
-    params[match[1]] = match[2];
-  }
-  return params;
-}
 
 class LoginPage extends Component {
   state = {
@@ -35,101 +25,15 @@ class LoginPage extends Component {
     finished: true,
   };
 
-  componentDidMount() {
-    Linking.getInitialURL().then(this.handeLaunchByUrl);
-    Linking.addEventListener("url", this.handeLaunchByUrl);
-  }
-
-  componentWillUnmount() {
-    Linking.removeEventListener("url", this.handeLaunchByUrl);
-  }
-
-  handeLaunchByUrl = (event) => {
-    if (event) {
-      var deepLinkParams = parseURL(decodeURIComponent(parseURL(event.url).link));
-      var mode = deepLinkParams.mode;
-      var oobCode = deepLinkParams.oobCode;
-
-      switch (mode) {
-        case 'verifyEmail':
-          this.handleVerifyEmail(oobCode);
-          break;
-        default:
-          console.warn('Wrong action!');
-      }
-    }
-  };
-
-  handleVerifyEmail = (oobCode) => {
-    firebase.auth().applyActionCode(oobCode).then(() => {
-      Alert.alert(
-        null,
-        'Thank you. Your email address has been verified.',
-        [{text: 'OK'}],
-      );
-      firebase.auth().currentUser.reload();
-    }).catch(error => {
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      if (errorCode) {
-        if (errorCode == 'auth/expired-action-code') {
-          this.setState(prev => ({
-            ...prev,
-            isVisible: true,
-            dialogText: message.LINK_EXPIRE,
-          }));
-        } else if (errorCode == 'auth/invalid-action-code') {
-          this.setState(prev => ({
-            ...prev,
-            isVisible: true,
-            dialogText: message.LINK_INVALID,
-          }));
-        } else {
-          this.setState(prev => ({
-            ...prev,
-            isVisible: true,
-            dialogText: errorMessage,
-          }));
-        }
-      }
-    });
-  }
-
-  handleSignOut = () => {
-    firebase.auth().signOut().then(() => ToastAndroid.show('Successfully signed out.', ToastAndroid.SHORT)).catch(error => {
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      if (errorCode) {
-        if (errorCode == 'auth/no-current-user') {
-          this.setState(prev => ({
-            ...prev,
-            isVisible: true,
-            dialogText: message.NO_USER,
-          }));
-        } else {
-          this.setState(prev => ({
-            ...prev,
-            isVisible: true,
-            dialogText: errorMessage,
-          }));
-        }
-      }
-    });
-  };
-
   render() {
     return (
       <ImageBackground source={HEADER} style={style.header}>
         <Text style={style.text}>Triton Deal</Text>
         <Login />
-        <GradientButton
-          text={"Sign Out"}
-          onPress={this.handleSignOut}
-        />
         <View style={style.bottomTextContainer}>
           <View style={style.bottomTextWrapper}>
             <TouchableOpacity>
-              <Text style={style.bottomText} onPress={() => Actions.EditProfile()}>Skip Login</Text>
+              <Text style={style.bottomText} onPress={() => Actions.root()}>Skip Login</Text>
             </TouchableOpacity>
           </View>
           <View tyle={style.bottomTextWrapper}>
