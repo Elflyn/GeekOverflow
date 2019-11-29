@@ -7,7 +7,7 @@ import GradientButton from "./GradientButton";
 export default class InputBox extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {isVisible: this.props.isVisible, text: this.props.text};
+        this.state = {isVisible: this.props.isVisible, text: '', title: this.props.text};
     }
 
     setVisible(visible) {
@@ -18,20 +18,21 @@ export default class InputBox extends React.Component {
         return (
             <View>
                 <Overlay
-                    isVisible={this.state.isVisible}
+                    isVisible={this.props.isVisible}
                     windowBackgroundColor="rgba(255, 255, 255, .8)"
                     overlayBackgroundColor="white"
                     width={350}
                     height="auto"
                 >
                     <ListItem
-                        title={this.state.text}
+                        title={this.state.title}
                         titleStyle={style.titleStyle}
-                        leftElement={<Button title="cancel" type="clear" />}
-                        rightElement={<Button title="Save" type="solid" />}
+                        leftElement={<Button title="cancel" type="clear" onPress={this.props.cancel} />}
+                        rightElement={<Button title="Save" type="solid" onPress={() => this.props.confirm(this.state.text)} />}
                     />
                     <Input
-                        placeholder={this.state.text}
+                        placeholder={this.state.title}
+                        onChangeText={value => this.setState({text: value})}
                     />
                 </Overlay>
             </View>
