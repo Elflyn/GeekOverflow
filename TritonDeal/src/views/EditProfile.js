@@ -4,6 +4,7 @@ import { Input, Icon, ListItem, Button, Overlay } from 'react-native-elements';
 import { firebase } from '@react-native-firebase/auth';
 import { Actions } from 'react-native-router-flux';
 import message from '../message';
+import ReauthDialog from '../components/ReauthDialog'
 //import GradientButton from './GradientButton';
 //import auth from '@react-native-firebase/auth';
 //import { firebase } from '@react-native-firebase/auth';
@@ -11,7 +12,7 @@ import message from '../message';
 
 export default class EditProfile extends React.Component {
 
-  state = { isVisible: false, text: "empty", finished: true, info: null };
+  state = { isVisible: false, text: "empty", finished: true, info: null, dialogVisible: false };
 
 
   toggleBox = () => {
@@ -51,7 +52,17 @@ export default class EditProfile extends React.Component {
 
   handleUpdateEmail = () => {
     firebase.auth().currentUser.updateEmail(this.state.info).then(() => {
-      firebase.auth().currentUser.sendEmailVerification();
+      var actionCodeSettings = {
+        url: 'https://ucsd.edu',
+        android: {
+          packageName: 'com.tritondeal',
+          installApp: true,
+          minimumVersion: '12'
+        },
+        handleCodeInApp: true,
+        dynamicLinkDomain: "tritondeal.page.link"
+      };
+      firebase.auth().currentUser.sendEmailVerification(actionCodeSettings);
       ToastAndroid.show(message.VALIDATE_EAMIL, ToastAndroid.SHORT);
       firebase.auth().currentUser.reload().then(() => {
         this.toggleActivityIndicator();
@@ -61,9 +72,8 @@ export default class EditProfile extends React.Component {
       var errorCode = error.code;
       var errorMessage = error.message;
       if (errorCode == "auth/requires-recent-login") {
-        ToastAndroid.show("Session exipred. Please log in and try again.");
-        firebase.auth().signOut();
-        Actions.login();
+        ToastAndroid.show("Session exipred. Please re-enter your password.", ToastAndroid.SHORT);
+        this.setState({ dialogVisible: true, finished: true });
       } else {
         ToastAndroid.show(errorCode + ": " + errorMessage, ToastAndroid.SHORT);
       }
@@ -152,6 +162,7 @@ export default class EditProfile extends React.Component {
         >
           <ActivityIndicator size='large' color='#eabb33' />
         </Overlay>
+        <ReauthDialog visible={this.state.dialogVisible} newEmail={this.state.info} />
       </View>
     )
   };

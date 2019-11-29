@@ -12,9 +12,9 @@ export default class SplashScreen extends React.Component {
 
   componentDidMount = () => {
     if (firebase.auth().currentUser) {
-      setTimeout(() => Actions.root(), 1000);
+      setTimeout(() => Actions.root(), 500);
     } else {
-      setTimeout(() => Actions.login(), 1000);
+      setTimeout(() => Actions.login(), 500);
     }
   }
   
