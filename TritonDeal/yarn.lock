@@ -937,6 +937,13 @@
     wcwidth "^1.0.1"
     ws "^1.1.0"
 
+"@react-native-community/datetimepicker@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-2.1.0.tgz#4e3413462cbbe5c48fab6cebd422835031cdf7b9"
+  integrity sha512-InktUrx0/4JTy1YsgswljgID7oB3L8wkFobRhnLGWPExSsNHeecGW2/nBP31ZaOPHcjVWhpOQMZt0zDpKfGE/Q==
+  dependencies:
+    invariant "^2.2.4"
+
 "@react-native-community/eslint-config@^0.0.5":
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/@react-native-community/eslint-config/-/eslint-config-0.0.5.tgz#584f6493258202a57efc22e7be66966e43832795"
@@ -958,6 +965,15 @@
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/app-types/-/app-types-6.1.0.tgz#b7a2cd678e7c54f0b17d1e2faa7b8131333facdb"
   integrity sha512-w5VxtgMyqx0DU5y2vKzBT8f313ruaykC4T14P/vp8sQwVeitUolLrD7SLOZW9SUm7epExrQDPrdW7M3SFeze0g==
+"@react-native-community/picker@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@react-native-community/picker/-/picker-1.1.2.tgz#f6f8a0c7a3ec4bbf2cb9c05813e32ddfa090ce00"
+  integrity sha512-0bw1VmAt9q3aEIXnaELqkrFNEtuoIvok/JVG0SDoMIPrDGpv8YL7KMlGqu/kw8Zi52du/rTSx7Avv9Bc5mIJ9w==
+
+"@react-native-firebase/app-types@6.0.4":
+  version "6.0.4"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/app-types/-/app-types-6.0.4.tgz#f6c78b4759ffd46d08bc1d2ed0c40c10e1b1791c"
+  integrity sha512-jy6ySprTk786pFZEMaTsvwvaqphD1uCIr8jtAAno9KrUhiZWpizHrAsTpKA6QR2IZoTmYtHv6eWatKKVvKcQcg==
 
 "@react-native-firebase/app@^6.0.4":
   version "6.1.0"

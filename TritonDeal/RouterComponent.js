@@ -7,6 +7,7 @@ import SplashScreen from './src/views/SplashScreen'
 import Placeholder from './src/views/Placeholder'
 import ChatList from './src/views/ChatList'
 import Chat from './src/components/Chat'
+import Post from './src/views/Post'
 import Profile from './src/views/Profile';
 import { Icon } from 'react-native-elements';
 import EditProfile from './src/views/EditProfile';
@@ -138,10 +139,11 @@ export default class RouterComponent extends React.Component {
               <Scene key="_post" iconName={'plus-box-outline'} icon={TabIcon}>
                 <Scene
                   key="post"
-                  component={Placeholder}
+                  component={Post}
                   navigationBarStyle={style.nav}
-                  title="Register"
+                  title="Post Item"
                   titleStyle={style.title}
+                  renderLeftButton={() => renderBackButton()}
                 />
               </Scene>
               <Scene key="_message" iconName={'message-text-outline'} icon={TabIcon}>
