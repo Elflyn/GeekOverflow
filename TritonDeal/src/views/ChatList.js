@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, Linking, TouchableOpacity, ScrollView } from 'react-native';
 import { ListItem, Avatar} from 'react-native-elements';
+import { Actions } from 'react-native-router-flux';
 
 export default class ChatList extends React.Component {
 
@@ -27,6 +28,7 @@ export default class ChatList extends React.Component {
             titleStyle={style.title}
             subtitle={<Subtitle message={item.message} description={item.description}/>}
             rightElement={<TimeDisplay time="11:30"/>}
+            onPress={() => Actions.chat({title: item.name})}
           />))
       }
 

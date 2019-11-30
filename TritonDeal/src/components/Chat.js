@@ -92,6 +92,7 @@ export default class Chat extends React.Component {
         onSend={this.send}
         user={this.user}
         showUserAvatar
+        multiline={false}
       />
     );
   }

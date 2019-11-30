@@ -146,13 +146,22 @@ export default class RouterComponent extends React.Component {
                   renderLeftButton={() => renderBackButton()}
                 />
               </Scene>
-              <Scene key="_message" iconName={'message-text-outline'} icon={TabIcon}>
+              <Scene key="_chatList" iconName={'message-text-outline'} icon={TabIcon}>
                 <Scene
-                  key="message"
-                  component={Chat}
+                  key="chatList"
+                  component={ChatList}
                   navigationBarStyle={style.nav}
                   title="Chat"
                   titleStyle={style.title}
+                />
+                <Scene
+                  key="chat"
+                  component={Chat}
+                  navigationBarStyle={style.nav}
+                  title={this.props.title}
+                  titleStyle={style.title}
+                  hideTabBar
+                  renderLeftButton={() => renderBackButton()}
                 />
               </Scene>
               <Scene key="_account" iconName={'account'} icon={TabIcon}>
