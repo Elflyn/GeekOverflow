@@ -2,8 +2,9 @@ import React from 'react';
 import { StyleSheet, View, Text, Linking, TouchableOpacity, ToastAndroid, Alert, ActivityIndicator, KeyboardAvoidingView } from 'react-native';
 import { Input, Icon, Overlay } from 'react-native-elements';
 import GradientButton from './GradientButton';
-import auth from '@react-native-firebase/auth';
-import { firebase } from '@react-native-firebase/auth';
+import { firebase } from '@react-native-firebase/app';
+import '@react-native-firebase/auth';
+import '@react-native-firebase/database';
 import { Actions } from 'react-native-router-flux';
 import Dialog from './Dialog';
 import message from '../message';
@@ -113,7 +114,11 @@ export default class Register extends React.Component {
       firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then(() => {
         firebase.auth().currentUser.updateProfile({
           displayName: this.state.username,
-        }).then(() => firebase.auth().currentUser.reload());
+        }).then(() => {
+          firebase.auth().currentUser.reload()
+          const ref = firebase.database().ref('email_to_uid');
+          ref.push({ email: this.state.email, uid: firebase.auth().currentUser.uid })
+        });
       }).catch((error) => {
         this.toggleActivityIndicator();
         var errorCode = error.code;

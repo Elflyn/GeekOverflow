@@ -153,6 +153,7 @@ export default class RouterComponent extends React.Component {
                   navigationBarStyle={style.nav}
                   title="Chat"
                   titleStyle={style.title}
+                  renderRightButton={() => renderAddButton()}
                 />
                 <Scene
                   key="chat"
@@ -212,6 +213,19 @@ const renderBackButton = () => (
   </TouchableOpacity>
 );
 
+const renderAddButton = () => (
+  <TouchableOpacity
+    onPress={() => {
+      const cl = Actions.refs.chatList;
+      cl.addChat();
+    }}
+  >
+    <View style={{ alignItems: 'center' }}>
+      <Icon iconStyle={style.addIconStyle} name="person-add" type="MaterialIcons" />
+    </View>
+  </TouchableOpacity>
+);
+
 function parseURL(url) {
   var regex = /[?&]([^=#]+)=([^&#]*)/g,
     params = {},
@@ -250,5 +264,10 @@ const style = StyleSheet.create({
   iconStyle: {
     color: 'white',
     marginLeft: 10,
+  },
+
+  addIconStyle: {
+    color: 'white',
+    marginRight: 10,
   },
 });
