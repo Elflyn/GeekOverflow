@@ -14,4 +14,7 @@ export default {
   SIGNED_IN: 'You have already signed in',
   POST_MISSING_TITLE: 'Please enter a title for this item',
   POST_SUCCESS: 'You have successfully posted your item',
+  BID_PROMPT:'You are about to join this bid. Once you placed a bid, it cannot cancel.If your holds the highest bid by the end, you automatically purchase this item.',
+  BUY_PROMPT:"You are about to purchase this item. Once purchased,you should contact seller for transaction and this item is marked sold.",
+  SUCCESS_PURCHASE:"You have purchased this item. Contact seller now."
 }
