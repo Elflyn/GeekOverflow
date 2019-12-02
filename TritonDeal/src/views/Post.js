@@ -13,6 +13,11 @@ import {Picker} from '@react-native-community/picker';
 import GradientButton from '../components/GradientButton';
 import InputBox from '../components/InputBox';
 import ImagePicker from 'react-native-image-crop-picker';
+import firebase from '@react-native-firebase/app';
+import Dialog from '../components/Dialog'
+import {Actions} from 'react-native-router-flux';
+import message from '../message'
+
 
 class Post extends Component {
 
@@ -23,11 +28,56 @@ class Post extends Component {
     condition: 'good',
     showDatePicker: false,
     dateValue: new Date(),
-    tags: ['hello', 'world', 'abc'],
+    tags: [],
     showInputBox: false,
     ipnutText: '',
     description: '',
     photos: [],
+    isVisible: false,
+    dialogText: '',
+    handleDialog: this.closeDialog,
+    photos: []
+  }
+
+  closeDialog = () => {
+    this.setState({isVisible: false});
+  }
+
+  handleSentPostSuccess = () => {
+    Actions.home();
+    this.setState({isVisible: false});
+  }
+
+  handleNewPost = () => {
+    const user = firebase.auth().currentUser
+    const postRef = firebase.database().ref('post')
+    const {bid, dateValue, condition, description, title, tags, photos} = this.state
+    if (title === '') {
+      this.setState({isVisible: true, dialogText: message.POST_MISSING_TITLE, handleDialog: this.closeDialog})
+    } else {
+      postRef.push({
+        "bid": bid,
+        "date": dateValue,
+        "condition": condition,
+        "description": description,
+        "title": title,
+        "tags": tags,
+        "user": user.uid,
+        "active": true,
+      }).then(snap => 
+        { const key = snap.key;
+          photos.forEach(photo => {
+            fetch(photo).then(response => {
+              response.blob().then(blob => {
+                const ref = firebase.storage().ref('postImage').child(key)
+                ref.put(blob)
+              })
+            })
+          })
+
+        });
+      this.setState({isVisible: true, dialogText: message.POST_SUCCESS, handleDialog: this.handleSentPostSuccess})
+    }
   }
 
   setDate = (event, date) => {
@@ -61,10 +111,10 @@ class Post extends Component {
   selectImage = () => {
     ImagePicker.openPicker({
       width: 512,
-      height: 512,
+      height: 300,
       cropping: true,
     }).then(image => {
-      console.log(image)
+      this.setState({photos: [...this.state.photos, image.path]})
     });
   }
 
@@ -160,13 +210,14 @@ class Post extends Component {
           />
         }       
         </View>
-        <GradientButton text='Post'/>
+        <GradientButton text='Post' onPress={this.handleNewPost}/>
         <InputBox
           cancel={this.toggleInputBox}
           confirm={(input) => {this.updateTags(input); this.toggleInputBox()}}
           isVisible={showInputBox}
           text='Add Tag'
         />
+        <Dialog isVisible={this.state.isVisible} text={this.state.dialogText} onPress={this.state.handleDialog} />
       </ScrollView>
     )
   }

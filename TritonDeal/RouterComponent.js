@@ -6,6 +6,7 @@ import SignupPage from './src/views/SignupPage';
 import SplashScreen from './src/views/SplashScreen'
 import Placeholder from './src/views/Placeholder'
 import ChatList from './src/views/ChatList'
+import HomePage from './src/views/HomePage'
 import Chat from './src/components/Chat'
 import Post from './src/views/Post'
 import Profile from './src/views/Profile';
@@ -130,9 +131,10 @@ export default class RouterComponent extends React.Component {
               <Scene key="_home" iconName={'home'} icon={TabIcon}>
                 <Scene
                   key="home"
-                  component={Placeholder}
+                  hideNavBar
+                  component={HomePage}
                   navigationBarStyle={style.nav}
-                  title="Register"
+                  title="Home"
                   titleStyle={style.title}
                 />
               </Scene>
