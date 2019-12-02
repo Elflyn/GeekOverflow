@@ -20,6 +20,7 @@ import StackViewStyleInterpolator from 'react-navigation-stack/src/views/StackVi
 export default class RouterComponent extends React.Component {
 
   async componentDidMount() {
+    console.disableYellowBox = true;
     initLink = await firebase.dynamicLinks().getInitialLink();
     if (initLink) {
       var deepLinkParams = parseURL(initLink.url);

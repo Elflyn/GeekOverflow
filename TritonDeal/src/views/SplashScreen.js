@@ -12,9 +12,10 @@ export default class SplashScreen extends React.Component {
   }
 
   componentDidMount = async () => {
-    const cl = new ChatList();
-    this.props.updateList(await cl.getList());
+
     if (firebase.auth().currentUser) {
+      const cl = new ChatList();
+      this.props.updateList(await cl.getList());
       setTimeout(() => Actions.root(), 500);
     } else {
       setTimeout(() => Actions.login(), 500);
