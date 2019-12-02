@@ -63,6 +63,8 @@ export default class Chat extends React.Component {
   };
 
   send = (messages) => {
+    const cl = Actions.refs.chatList;
+    cl.updateList();
     for (let i = 0; i < messages.length; i++) {
       const { text, user } = messages[i];
       const message = {

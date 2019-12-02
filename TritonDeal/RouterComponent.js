@@ -101,9 +101,6 @@ export default class RouterComponent extends React.Component {
         ],
       );
       return true;
-    } else if (Actions.currentScene === 'chat') {
-      const cl = Actions.refs.chatList;
-      cl.updateList();
     }
   }
 
@@ -165,7 +162,7 @@ export default class RouterComponent extends React.Component {
                   title={this.props.title}
                   titleStyle={style.title}
                   hideTabBar
-                  renderLeftButton={() => renderBackButtonFromChat()}
+                  renderLeftButton={() => renderBackButton()}
                 />
               </Scene>
               <Scene key="_account" iconName={'account'} icon={TabIcon}>
@@ -209,20 +206,6 @@ export default class RouterComponent extends React.Component {
 const renderBackButton = () => (
   <TouchableOpacity
     onPress={() => Actions.pop()}
-  >
-    <View style={{ alignItems: 'center' }}>
-      <Icon iconStyle={style.iconStyle} name="keyboard-arrow-left" type="MaterialIcons" />
-    </View>
-  </TouchableOpacity>
-);
-
-const renderBackButtonFromChat = () => (
-  <TouchableOpacity
-    onPress={() => {
-      Actions.pop()
-      const cl = Actions.refs.chatList;
-      cl.updateList();
-    }}
   >
     <View style={{ alignItems: 'center' }}>
       <Icon iconStyle={style.iconStyle} name="keyboard-arrow-left" type="MaterialIcons" />
