@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import {Input, ListItem, Icon, Button, Divider, Avatar, Badge} from 'react-native-elements';
+import {Input, ListItem, Overlay, Divider, Avatar, Badge} from 'react-native-elements';
 import {
   StyleSheet,
   View,
   Text,
-  TouchableOpacity,
+  ActivityIndicator,
   ScrollView
 
 } from 'react-native';
@@ -14,6 +14,9 @@ import GradientButton from '../components/GradientButton';
 import InputBox from '../components/InputBox';
 import ImagePicker from 'react-native-image-crop-picker';
 import firebase from '@react-native-firebase/app';
+import '@react-native-firebase/database';
+import '@react-native-firebase/auth';
+import '@react-native-firebase/storage';
 import Dialog from '../components/Dialog'
 import {Actions} from 'react-native-router-flux';
 import message from '../message'
@@ -36,16 +39,37 @@ class Post extends Component {
     isVisible: false,
     dialogText: '',
     handleDialog: this.closeDialog,
-    photos: []
+    photos: [],
+    finished: true
   }
 
   closeDialog = () => {
-    this.setState({isVisible: false});
+    this.setState({
+      isVisible: false,
+    });
   }
 
   handleSentPostSuccess = () => {
     Actions.home();
-    this.setState({isVisible: false});
+    this.setState({
+      isVisible: false, 
+      title: '',
+      bid: false,
+      date: '10-10-2020',
+      condition: 'good',
+      showDatePicker: false,
+      dateValue: new Date(),
+      tags: [],
+      showInputBox: false,
+      ipnutText: '',
+      description: '',
+      photos: [],
+      isVisible: false,
+      dialogText: '',
+      handleDialog: this.closeDialog,
+      photos: [],
+      finished: true
+    });
   }
 
   handleNewPost = () => {
@@ -55,6 +79,7 @@ class Post extends Component {
     if (title === '') {
       this.setState({isVisible: true, dialogText: message.POST_MISSING_TITLE, handleDialog: this.closeDialog})
     } else {
+      this.setState({finished:false})
       postRef.push({
         "bid": bid,
         "date": dateValue,
@@ -72,12 +97,11 @@ class Post extends Component {
               response.blob().then(blob => {
                 const ref = firebase.storage().ref('postImage').child(`${key}-${i}`)
                 ref.put(blob);
-                console.log(i)
               })
             })
           })
         });
-      this.setState({isVisible: true, dialogText: message.POST_SUCCESS, handleDialog: this.handleSentPostSuccess})
+      this.setState({isVisible: true, dialogText: message.POST_SUCCESS, handleDialog: this.handleSentPostSuccess, finished:true})
     }
   }
 
@@ -112,7 +136,7 @@ class Post extends Component {
   selectImage = () => {
     ImagePicker.openPicker({
       width: 512,
-      height: 300,
+      height: 280,
       cropping: true,
     }).then(image => {
       this.setState({photos: [...this.state.photos, image.path]})
@@ -128,8 +152,8 @@ class Post extends Component {
   }
   
   render() {
-    const { showDatePicker, date, condition, dateValue, tags, showInputBox, ipnutText, photos} = this.state;
-    const conditions = ['good', 'acceptable', 'like new'];
+    const { showDatePicker, date, condition, dateValue, tags, showInputBox, title, photos} = this.state;
+    const conditions = ['Brand New', 'Like New', 'Open Box', 'Used', 'Manufacturer Refurbished', 'acceptable', 'For parts or not working'];
     return (
       <ScrollView>
         <View style={style.upperContainer}>
@@ -219,6 +243,13 @@ class Post extends Component {
           text='Add Tag'
         />
         <Dialog isVisible={this.state.isVisible} text={this.state.dialogText} onPress={this.state.handleDialog} />
+        <Overlay
+          isVisible={!this.state.finished}
+          width="auto"
+          height="auto"
+        >
+          <ActivityIndicator size='large' color='#eabb33' />
+        </Overlay>
       </ScrollView>
     )
   }

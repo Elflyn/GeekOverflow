@@ -205,7 +205,7 @@ const style = StyleSheet.create({
     borderBottomWidth:1,
     borderColor:"#747678",
     padding:2,
-    height: 250,
+    height: 280,
   },
   multiImage:{
     width:370,
