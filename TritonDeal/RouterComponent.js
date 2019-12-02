@@ -15,6 +15,7 @@ import { Icon } from 'react-native-elements';
 import EditProfile from './src/views/EditProfile';
 import { firebase } from '@react-native-firebase/auth';
 import message from './src/message';
+import StackViewStyleInterpolator from 'react-navigation-stack/src/views/StackView/StackViewStyleInterpolator';
 
 export default class RouterComponent extends React.Component {
 
@@ -121,7 +122,7 @@ export default class RouterComponent extends React.Component {
   render() {
     return (
       <Router>
-        <Stack>
+        <Stack transitionConfig={() => ({ screenInterpolator: StackViewStyleInterpolator.forHorizontal })}>
           <Scene key="root" headerLayoutPreset="center" hideNavBar>
             <Tabs
               key="nav"
@@ -150,7 +151,7 @@ export default class RouterComponent extends React.Component {
                   titleStyle={style.title}
                 />
               </Scene>
-              <Scene key="_chatList" iconName={'message-text-outline'} icon={TabIcon}>
+              <Scene key="_chatList" iconName={'message-text-outline'} icon={TabIcon} transitionConfig={() => ({ screenInterpolator: StackViewStyleInterpolator.forHorizontal })}>
                 <Scene
                   key="chatList"
                   component={ChatList}
