@@ -40,7 +40,7 @@ export default class HomePage extends Component {
     const search  = this.state.search;
     return (
       <View style={style.container}>
-        {/* <TopNavBar /> */}
+        <TopNavBar />
         <SearchBar
           platform="android"
           placeholder="Search"

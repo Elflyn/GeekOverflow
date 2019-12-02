@@ -54,8 +54,6 @@ export default class ItemDisplay extends Component{
             <View style={style.rightView}>
               <Text style={style.countdown}>{this.props.timeleft} left</Text>
               <Icon name="timer" iconStyle={style.timer}/>
-              <Button type="solid" title="Bid" buttonStyle={style.button}
-              onPress={()=>this.bidOnClick(this.props.currentBid)} />
             </View>
           </View>
         </View>
@@ -84,7 +82,7 @@ export default class ItemDisplay extends Component{
             <View style={style.detailTitleRow}>
               <Text style={style.detailTitle}>{this.props.itemName}</Text>
               <View style={style.detailTopIcon}>
-                <Icon name="star-border" size={28}/>
+              <Button title="Add to chart" buttonStyle={{width:150}} type="clear"/>
                 <Icon name="close" onPress={() => this.setState({ itemDetail: false })} size={28}/>
               </View>
             </View>
@@ -112,21 +110,10 @@ export default class ItemDisplay extends Component{
               </View>
               <Text style={{fontSize:18,padding:5}}>{this.props.description}</Text>
             </ScrollView>
-            <View style={{margin:5,flexDirection:"row"}}>
+            <View style={{flexDirection:"row", justifyContent: 'center'}}>
               <Button title="Contact Seller" buttonStyle={{margin:10}}/>
               <Button type="solid" title="Bid" buttonStyle={{margin:10,width:100}}
               onPress={()=>this.bidOnClick(this.props.currentBid)} />
-              <Button title="Buy" buttonStyle={{margin:10,width:100}} onPress={()=>{
-                Alert.alert("Buy Action",message.BUY_PROMPT,[
-                  {text:'Confirm', onPress:()=>{
-                    Alert.alert("Success Purchase",message.SUCCESS_PURCHASE,[
-                      {text:"Contact Seller"}
-                    ])
-                  }},
-                  {text:'Cancel'}
-                ])
-              }}/>
-
             </View>
           </View>
         </Overlay>
