@@ -3,6 +3,7 @@ import { View, StyleSheet, ImageBackground, StatusBar } from 'react-native'
 import { firebase } from '@react-native-firebase/auth';
 import { SPLASH } from '../images';
 import { Actions, ActionConst } from 'react-native-router-flux';
+import ChatList from './ChatList';
 
 export default class SplashScreen extends React.Component {
 
@@ -10,7 +11,9 @@ export default class SplashScreen extends React.Component {
     isUserLoggedIn: false
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
+    const cl = new ChatList();
+    this.props.updateList(await cl.getList());
     if (firebase.auth().currentUser) {
       setTimeout(() => Actions.root(), 500);
     } else {

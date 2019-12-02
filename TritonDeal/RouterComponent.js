@@ -110,6 +110,9 @@ export default class RouterComponent extends React.Component {
         Actions.login();
         return true;
       }
+    } else if (navigation.state.routeName == '_chatList') {
+      Actions.jump('chatList', {initList: this.list});
+      return true;
     }
     defaultHandler()
   }
@@ -175,6 +178,9 @@ export default class RouterComponent extends React.Component {
             component={SplashScreen}
             initial
             hideNavBar
+            updateList={(list) => {
+              this.list = list;
+            }}
           />
           <Scene
             key="login"
@@ -235,7 +241,6 @@ function parseURL(url) {
   }
   return params;
 }
-
 
 class TabIcon extends React.Component {
   render() {

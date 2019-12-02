@@ -11,19 +11,23 @@ import '@react-native-firebase/storage';
 
 export default class ChatList extends React.Component {
 
-  state = {
-    isVisible: false,
-    dialogText: 'Enter email',
-    email: null,
-    list: []
+  constructor(props) {
+    super(props);
+    this.state = {
+      isVisible: false,
+      dialogText: 'Enter email',
+      email: null,
+      list: []
+    }
   }
 
   componentDidMount = () => {
+    this.setState({ list: this.props.initList })
     this.refOn((chatListItem) => {
-      this.setState(prevState => ({
-        list: [...prevState.list, chatListItem]
-      }))
-    })
+      var newList = [...this.state.list, chatListItem];
+      newList.sort((a, b) => { return b.lastTime - a.lastTime })
+      this.setState({list: newList});
+    });
   }
 
   componentWillUnmount() {
@@ -90,18 +94,36 @@ export default class ChatList extends React.Component {
   }
 
   updateList = async () => {
-    var list = [];
-    this.chatListRef.once('value').then(async snapshot => {
-      snapshot.forEach(async childSnapshot => {
-        const chatListItem = await this.parse(childSnapshot);
-        list.push(chatListItem);
-        this.setState({ list: list });
-      })
-    });
+    const snapshot = await this.chatListRef.once('value');
+    const toWait = [];
+    snapshot.forEach(async childSnapshot => {
+      toWait.push(this.parse(childSnapshot));
+    })
+    const list = await Promise.all(toWait);
+    list.sort((a, b) => { return b.lastTime - a.lastTime })
+    this.setState({ list: list });
+  }
+
+  getList = async () => {
+    const snapshot = await this.chatListRef.once('value');
+    const toWait = [];
+    snapshot.forEach(async childSnapshot => {
+      toWait.push(this.parse(childSnapshot));
+    })
+    const list = await Promise.all(toWait);
+    list.sort((a, b) => {return b.lastTime - a.lastTime})
+    return list;
   }
 
   refOn = async (callback) => {
-    this.chatListRef.on('child_added', async snapshot => callback(await this.parse(snapshot)));
+    var list_num = this.props.initList.length;
+    var event_count = 0
+    this.chatListRef.on('child_added', async snapshot => {
+      if (event_count >= list_num) {
+        callback(await this.parse(snapshot));
+      }
+      event_count += 1;
+    });
   }
 
   refOff = () => {
@@ -146,10 +168,10 @@ export default class ChatList extends React.Component {
     }
     const chatRef = this.chatByIdRef.push(chat);
     const chatListRef = firebase.database().ref('user_to_chat');
-    chatListRef.child(currUID).push({ 
+    chatListRef.child(currUID).push({
       chatID: chatRef.key,
       anotherUID: anotherUID,
-     });
+    });
     chatListRef.child(anotherUID).push({
       chatID: chatRef.key,
       anotherUID: anotherUID,
@@ -179,7 +201,7 @@ export default class ChatList extends React.Component {
                 leftAvatar={{ size: 'medium', source: { uri: item.avatar } }}
                 title={item.name}
                 titleStyle={style.title}
-                subtitle={<Subtitle message={item.message} style={style.message}/>}
+                subtitle={<Subtitle message={item.message} style={style.message} />}
                 rightElement={<TimeDisplay time={item.lastTime} />}
                 onPress={() => {
                   Actions.chat({ title: item.name, chatID: item.chatID })
@@ -214,7 +236,7 @@ export default class ChatList extends React.Component {
   }
 }
 
-const TimeDisplay = ({time}) => {
+const TimeDisplay = ({ time }) => {
   return (
     <Text style={{ color: 'grey' }}>{getTimeString(time)}</Text>
   )
