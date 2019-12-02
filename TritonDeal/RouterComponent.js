@@ -6,7 +6,6 @@ import SignupPage from './src/views/SignupPage';
 import SplashScreen from './src/views/SplashScreen'
 import Placeholder from './src/views/Placeholder'
 import ChatList from './src/views/ChatList'
-import HomePage from './src/views/HomePage'
 import Chat from './src/components/Chat'
 import Post from './src/views/Post'
 import Profile from './src/views/Profile';
@@ -101,6 +100,9 @@ export default class RouterComponent extends React.Component {
         ],
       );
       return true;
+    } else if (Actions.currentScene === 'chat') {
+      const cl = Actions.refs.chatList;
+      cl.updateList();
     }
   }
 
@@ -131,10 +133,9 @@ export default class RouterComponent extends React.Component {
               <Scene key="_home" iconName={'home'} icon={TabIcon}>
                 <Scene
                   key="home"
-                  hideNavBar
-                  component={HomePage}
+                  component={Placeholder}
                   navigationBarStyle={style.nav}
-                  title="Home"
+                  title="Register"
                   titleStyle={style.title}
                 />
               </Scene>
@@ -164,7 +165,7 @@ export default class RouterComponent extends React.Component {
                   title={this.props.title}
                   titleStyle={style.title}
                   hideTabBar
-                  renderLeftButton={() => renderBackButton()}
+                  renderLeftButton={() => renderBackButtonFromChat()}
                 />
               </Scene>
               <Scene key="_account" iconName={'account'} icon={TabIcon}>
@@ -208,6 +209,20 @@ export default class RouterComponent extends React.Component {
 const renderBackButton = () => (
   <TouchableOpacity
     onPress={() => Actions.pop()}
+  >
+    <View style={{ alignItems: 'center' }}>
+      <Icon iconStyle={style.iconStyle} name="keyboard-arrow-left" type="MaterialIcons" />
+    </View>
+  </TouchableOpacity>
+);
+
+const renderBackButtonFromChat = () => (
+  <TouchableOpacity
+    onPress={() => {
+      Actions.pop()
+      const cl = Actions.refs.chatList;
+      cl.updateList();
+    }}
   >
     <View style={{ alignItems: 'center' }}>
       <Icon iconStyle={style.iconStyle} name="keyboard-arrow-left" type="MaterialIcons" />

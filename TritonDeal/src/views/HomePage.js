@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {SearchBar,Overlay,Icon,ListItem} from 'react-native-elements'
-import {View,Text,FlatList,StyleSheet,SafeAreaView,TouchableOpacity} from 'react-native';
+import {View,Text,FlatList,StyleSheet,SafeAreaView,TouchableOpacity,StatusBar} from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
 import TopNavBar from '../components/TopNavBar'
 //TODO:if need to control item title in 30 characters
@@ -89,6 +89,7 @@ export default class HomePage extends Component {
 
 const style = StyleSheet.create({
   container:{
+    paddingTop: StatusBar.currentHeight,
     margin:10
   },
   searchBar:{

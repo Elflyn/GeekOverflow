@@ -89,6 +89,17 @@ export default class ChatList extends React.Component {
     this.setState({ isVisible: true });
   }
 
+  updateList = async () => {
+    var list = [];
+    this.chatListRef.once('value').then(async snapshot => {
+      snapshot.forEach(async childSnapshot => {
+        const chatListItem = await this.parse(childSnapshot);
+        list.push(chatListItem);
+        this.setState({ list: list });
+      })
+    });
+  }
+
   refOn = async (callback) => {
     this.chatListRef.on('child_added', async snapshot => callback(await this.parse(snapshot)));
   }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { GiftedChat } from 'react-native-gifted-chat';
+import { Actions } from 'react-native-router-flux';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';
 import '@react-native-firebase/auth';
@@ -25,10 +26,15 @@ export default class Chat extends React.Component {
   componentWillUnmount() {
     this.refOff();
   }
-
+  
   updateAvatarURI = async () => {
     const ref = firebase.storage().ref('avatar').child(firebase.auth().currentUser.uid);
-    const url = await ref.getDownloadURL();
+    var url;
+    try {
+      url = await ref.getDownloadURL();
+    } catch (error) {
+      url = await firebase.storage().ref('avatar').child('defaultAvatar.jpg').getDownloadURL();
+    }
     this.setState({ avatarURI: url });
   }
 
@@ -66,6 +72,8 @@ export default class Chat extends React.Component {
       };
       this.ref.push(message);
     }
+    const rootRef = firebase.database().ref('chat_by_id/' + this.props.chatID);
+    rootRef.update({ lastText: messages[messages.length - 1].text, lastTime: this.timestamp })
   };
 
   get ref() {
