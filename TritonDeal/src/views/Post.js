@@ -64,17 +64,18 @@ class Post extends Component {
         "tags": tags,
         "user": user.uid,
         "active": true,
+        "photos": photos.length
       }).then(snap => 
         { const key = snap.key;
-          photos.forEach(photo => {
+          photos.forEach((photo, i) => {
             fetch(photo).then(response => {
               response.blob().then(blob => {
-                const ref = firebase.storage().ref('postImage').child(key)
-                ref.put(blob)
+                const ref = firebase.storage().ref('postImage').child(`${key}-${i}`)
+                ref.put(blob);
+                console.log(i)
               })
             })
           })
-
         });
       this.setState({isVisible: true, dialogText: message.POST_SUCCESS, handleDialog: this.handleSentPostSuccess})
     }
