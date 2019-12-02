@@ -131,7 +131,6 @@ export default class RouterComponent extends React.Component {
               <Scene key="_home" iconName={'home'} icon={TabIcon}>
                 <Scene
                   key="home"
-                  hideNavBar
                   component={HomePage}
                   navigationBarStyle={style.nav}
                   title="Home"
@@ -145,7 +144,6 @@ export default class RouterComponent extends React.Component {
                   navigationBarStyle={style.nav}
                   title="Post Item"
                   titleStyle={style.title}
-                  renderLeftButton={() => renderBackButton()}
                 />
               </Scene>
               <Scene key="_chatList" iconName={'message-text-outline'} icon={TabIcon}>
