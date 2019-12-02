@@ -28,8 +28,13 @@ export default class UserProfileView extends Component {
 
   updateAvatarURI = async () => {
     const ref = firebase.storage().ref('avatar').child(firebase.auth().currentUser.uid);
-    const url = await ref.getDownloadURL();
-    this.setState({ avatarURI: url });
+    try {
+      const url = await ref.getDownloadURL();
+      this.setState({ avatarURI: url });
+    } catch (error) {
+      const url = await firebase.storage().ref('avatar').child('defaultAvatar.jpg').getDownloadURL();
+      this.setState({ avatarURI: url });
+    }
   }
   
   handleSignOut = () => {
@@ -117,6 +122,7 @@ export default class UserProfileView extends Component {
             <Avatar 
               size={120}
               rounded 
+              title={firebase.auth().currentUser.displayName[0]}
               source={{ uri: this.state.avatarURI }}
               icon={{name: 'user', type: 'font-awesome'}} 
               containerStyle={styles.avatar}

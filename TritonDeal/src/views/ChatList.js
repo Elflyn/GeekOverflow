@@ -11,45 +11,97 @@ import '@react-native-firebase/storage';
 
 export default class ChatList extends React.Component {
 
-  list = [{
-    name: 'Hello',
-    message: 'super long message ffffffffffffffffffffffffffffffffffff',
-  },
-  {
-    name: 'World',
-    message: 'fadfasd',
-  }]
-
   state = {
     isVisible: false,
     dialogText: 'Enter email',
-    email: null
+    email: null,
+    list: []
   }
 
-  parse = (snapshot) => {
-    const { createdAt, text, user } = snapshot.val();
-    const { key: id } = snapshot;
-    const { key: _id } = snapshot;
+  componentDidMount = () => {
+    this.refOn((chatListItem) => {
+      console.log(chatListItem)
+      this.setState(prevState => ({
+        list: [...prevState.list, chatListItem]
+      }))
+    })
+  }
 
-    const message = {
-      id,
-      _id,
-      createdAt,
-      text,
-      user,
-    };
-    return message;
+  componentWillUnmount() {
+    this.refOff();
+  }
+
+  parse = async (snapshot) => {
+    const { chatID: chatID } = snapshot.val();
+    const chatRef = firebase.database().ref('chat_by_id');
+    var title, message, lastTime, anotherUID;
+    await chatRef.orderByKey().equalTo(chatID).once('value').then(async (snapshot) => {
+      snapshot.forEach(async childSnapshot => {
+        if (childSnapshot.val().user1 === firebase.auth().currentUser.uid) {
+          anotherUID = childSnapshot.val().user2;
+        } else {
+          anotherUID = childSnapshot.val().user1;
+        }
+        title = await this.getTitle(anotherUID);
+        message = childSnapshot.val().lastText;
+        lastTime = childSnapshot.val().lastTime;
+      });
+    }).catch((error) => {
+      var errorMessage = error.message;
+      ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+    });
+    const avatarURI = await this.getAvatar(anotherUID);
+    const chatListItem = {
+      name: title,
+      message: message,
+      avatar: avatarURI,
+      lastTime: lastTime
+    }
+    return chatListItem;
   };
+
+  getAvatar = async (uid) => {
+    const ref = firebase.storage().ref('avatar').child(uid);
+    var url;
+    try {
+      url = await ref.getDownloadURL();
+    } catch (error) {
+      url = await firebase.storage().ref('avatar').child('defaultAvatar.jpg').getDownloadURL();
+    }
+    return url;
+  }
+
+  getTitle = async (uid) => {
+    var title;
+    const uidRef = firebase.database().ref('users');
+    await uidRef.orderByChild('uid').equalTo(uid).once('value').then((snapshot) => {
+      snapshot.forEach(childSnapshot => {
+        title = childSnapshot.val().username;
+      })
+    }).catch((error) => {
+      var errorMessage = error.message;
+      ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+    });
+    return title;
+  }
 
   addChat = () => {
     this.setState({ isVisible: true });
+  }
+
+  refOn = async (callback) => {
+    this.chatListRef.on('child_added', async snapshot => callback(await this.parse(snapshot)));
+  }
+
+  refOff = () => {
+    this.chatListRef.off();
   }
 
   onPressOK = async () => {
     this.setState({ isVisible: false });
     const currUID = firebase.auth().currentUser.uid;
     var anotherUID = '';
-    const uidRef = firebase.database().ref('email_to_uid');
+    const uidRef = firebase.database().ref('users');
     await uidRef.orderByChild('email').equalTo(this.state.email).once('value').then((snapshot) => {
       snapshot.forEach(childSnapshot => {
         anotherUID = childSnapshot.val().uid;
@@ -58,13 +110,45 @@ export default class ChatList extends React.Component {
       var errorMessage = error.message;
       ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
     });
-    var sha1 = require('sha1');
-    const messageID = sha1(currUID + anotherUID);
-    console.log(messageID);
+    this.createChat(currUID, anotherUID)
   }
 
-  get ref() {
+  createChat = (currUID, anotherUID) => {
+    const chat = {
+      user1: currUID,
+      user2: anotherUID,
+      messages: [
+        {
+          text: 'Chat started',
+          createdAt: this.timestamp,
+          system: true,
+        }
+      ],
+      lastText: 'Chat started',
+      lastTime: this.timestamp,
+    }
+    const chatRef = this.chatByIdRef.push(chat);
+    const chatListRef = firebase.database().ref('user_to_chat');
+    chatListRef.child(currUID).push({ 
+      chatID: chatRef.key,
+      anotherUID: anotherUID,
+     });
+    chatListRef.child(anotherUID).push({
+      chatID: chatRef.key,
+      anotherUID: anotherUID,
+    });
+  }
+
+  get chatByIdRef() {
     return firebase.database().ref('chat_by_id');
+  }
+
+  get chatListRef() {
+    return firebase.database().ref('user_to_chat/' + firebase.auth().currentUser.uid);
+  }
+
+  get timestamp() {
+    return firebase.database.ServerValue.TIMESTAMP;
   }
 
   render() {
@@ -72,15 +156,14 @@ export default class ChatList extends React.Component {
       <View>
         <ScrollView>
           {
-            this.list.map((item, i) => (
+            this.state.list.map((item, i) => (
               <ListItem
                 key={i}
-                /* avatar : source: { uri: l.avatar_url }*/
-                leftAvatar={{ size: 'large', icon: { name: 'user', type: 'font-awesome' } }}
+                leftAvatar={{ size: 'medium', source: { uri: item.avatar } }}
                 title={item.name}
                 titleStyle={style.title}
-                subtitle={<Subtitle message={item.message} />}
-                rightElement={<TimeDisplay time="11:30" />}
+                subtitle={<Subtitle message={item.message} style={style.message}/>}
+                rightElement={<TimeDisplay time={item.lastTime} />}
                 onPress={() => Actions.chat({ title: item.name })}
               />))
           }
@@ -112,13 +195,19 @@ export default class ChatList extends React.Component {
   }
 }
 
-const TimeDisplay = ({ time }) => {
+const TimeDisplay = ({time}) => {
   return (
-    <Text style={{ color: 'grey' }}>{time}</Text>
+    <Text style={{ color: 'grey' }}>{getTimeString(time)}</Text>
   )
 }
 
-const Subtitle = ({ message, description }) => (
+const getTimeString = (timestamp) => {
+  // Create a new JavaScript Date object based on the timestamp
+  // multiplied by 1000 so that the argument is in milliseconds, not seconds.
+  return new Date(timestamp).toLocaleTimeString("en-US").slice(0, 5);
+}
+
+const Subtitle = ({ message }) => (
   <View>
     <Text style={style.message} numberOfLines={2}>{message}</Text>
   </View>
@@ -132,6 +221,7 @@ const style = StyleSheet.create({
   title: {
     fontSize: 21,
   },
+
   centerText: {
     textAlign: 'center',
     fontSize: 20,

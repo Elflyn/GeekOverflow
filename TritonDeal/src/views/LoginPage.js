@@ -9,7 +9,8 @@ import {
   TouchableOpacity,
   ToastAndroid,
   Alert,
-  StatusBar
+  StatusBar,
+  Dimensions
 } from 'react-native';
 import { Actions, ActionConst } from 'react-native-router-flux';
 import { HEADER } from '../images';
@@ -89,6 +90,11 @@ const style = StyleSheet.create({
     paddingTop: StatusBar.currentHeight,
     height: '100%',
     width: '100%',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
   },
 
   text: {

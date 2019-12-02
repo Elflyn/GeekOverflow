@@ -116,8 +116,8 @@ export default class Register extends React.Component {
           displayName: this.state.username,
         }).then(() => {
           firebase.auth().currentUser.reload()
-          const ref = firebase.database().ref('email_to_uid');
-          ref.push({ email: this.state.email, uid: firebase.auth().currentUser.uid })
+          const ref = firebase.database().ref('users');
+          ref.push({ email: this.state.email, uid: firebase.auth().currentUser.uid, username: this.state.username })
         });
       }).catch((error) => {
         this.toggleActivityIndicator();

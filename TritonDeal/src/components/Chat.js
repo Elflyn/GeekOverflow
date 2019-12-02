@@ -20,7 +20,6 @@ export default class Chat extends React.Component {
         messages: GiftedChat.append(previousState.messages, message),
       }))
     );
-
   }
 
   componentWillUnmount() {
