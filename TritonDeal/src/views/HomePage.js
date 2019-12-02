@@ -89,7 +89,6 @@ export default class HomePage extends Component {
 
 const style = StyleSheet.create({
   container:{
-    paddingTop: StatusBar.currentHeight,
     margin:10
   },
   searchBar:{

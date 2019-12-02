@@ -4,6 +4,7 @@ import { Scene, Router, Stack, Actions, Tabs, ActionConst } from 'react-native-r
 import LoginPage from './src/views/LoginPage';
 import SignupPage from './src/views/SignupPage';
 import SplashScreen from './src/views/SplashScreen'
+import HomePage from './src/views/HomePage'
 import Placeholder from './src/views/Placeholder'
 import ChatList from './src/views/ChatList'
 import Chat from './src/components/Chat'
@@ -135,7 +136,7 @@ export default class RouterComponent extends React.Component {
                   key="home"
                   component={HomePage}
                   navigationBarStyle={style.nav}
-                  title="Register"
+                  title="Home"
                   titleStyle={style.title}
                 />
               </Scene>
