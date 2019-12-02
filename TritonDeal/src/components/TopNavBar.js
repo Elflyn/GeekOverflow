@@ -13,7 +13,7 @@ export default class TopNavBar extends Component{
       <View style={style.container}>
         <View style={style.leftView}>
           <Icon name="room" size={20} iconStyle={style.pinStyle} />
-          <Picker
+          {/* <Picker
             mode = "dropdown"
             selectedValue={this.state.location}
             style={style.Picker}
@@ -22,7 +22,7 @@ export default class TopNavBar extends Component{
             }>
             <Picker.Item label="UCSD" value="UCSD"/>
             <Picker.Item label="CV" value="CV" />
-            </Picker>
+          </Picker> */}
         </View>
         <View style={style.rightVIew}>
           <Icon type="font-awesome" name="calendar-check-o" color = "#006A96" iconStyle={style.calendar}/>

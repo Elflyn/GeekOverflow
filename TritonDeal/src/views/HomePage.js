@@ -21,7 +21,7 @@ const SEARCH_RESULT=[{name:"Car", source :["http://media.wired.com/photos/5d0959
               tags:["car","used","bla"], description:"This is a 2017 used Infinity Q60, the condition is very new",price:10000,seller:"LL",timeleft:"4d 2h",currentBid:7000}]
 const suggestedItems=['car','Q60']
 const suggestedTags=['car','used']
-export default class HomePage extends Component <{}>{
+export default class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,7 +40,7 @@ export default class HomePage extends Component <{}>{
     const search  = this.state.search;
     return (
       <View style={style.container}>
-        <TopNavBar />
+        {/* <TopNavBar /> */}
         <SearchBar
           platform="android"
           placeholder="Search"
