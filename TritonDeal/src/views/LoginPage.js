@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Icon, Button, Overlay } from 'react-native-elements';
+import {Input, Icon, Button, Overlay, Avatar} from 'react-native-elements';
 import { Linking, ActivityIndicator } from 'react-native';
 import {
   StyleSheet,
@@ -96,7 +96,8 @@ const style = StyleSheet.create({
     color: '#006EA6',
     fontWeight: 'bold',
     fontSize: 35,
-    marginTop: 250,
+    marginTop: 220,
+    marginBottom: 40,
   },
 
   centerText: {
@@ -132,6 +133,7 @@ const style = StyleSheet.create({
     textDecorationLine: 'underline',
     fontSize: 18,
     paddingRight: 10,
+    marginTop: 30
   },
 
   bottomTextWrapper: {

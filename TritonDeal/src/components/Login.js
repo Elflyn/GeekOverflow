@@ -158,6 +158,7 @@ const style = StyleSheet.create({
     textAlign: 'right',
     fontSize: 18,
     paddingRight: 10,
+    marginBottom: 10,
   },
 
   loginContainer: {
