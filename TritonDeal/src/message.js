@@ -12,5 +12,6 @@ export default {
   LINK_INVALID: 'Your verification link is invalid.',
   NO_USER: 'No user is currently signed in.',
   SIGNED_IN: 'You have already signed in',
-
+  POST_MISSING_TITLE: 'Please enter a title for this item',
+  POST_SUCCESS: 'You have successfully posted your item',
 }
