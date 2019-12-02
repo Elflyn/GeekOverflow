@@ -20,7 +20,6 @@ export default class ChatList extends React.Component {
 
   componentDidMount = () => {
     this.refOn((chatListItem) => {
-      console.log(chatListItem)
       this.setState(prevState => ({
         list: [...prevState.list, chatListItem]
       }))
@@ -55,7 +54,8 @@ export default class ChatList extends React.Component {
       name: title,
       message: message,
       avatar: avatarURI,
-      lastTime: lastTime
+      lastTime: lastTime,
+      chatID: chatID
     }
     return chatListItem;
   };
@@ -99,18 +99,24 @@ export default class ChatList extends React.Component {
 
   onPressOK = async () => {
     this.setState({ isVisible: false });
-    const currUID = firebase.auth().currentUser.uid;
-    var anotherUID = '';
-    const uidRef = firebase.database().ref('users');
-    await uidRef.orderByChild('email').equalTo(this.state.email).once('value').then((snapshot) => {
-      snapshot.forEach(childSnapshot => {
-        anotherUID = childSnapshot.val().uid;
-      })
-    }).catch((error) => {
-      var errorMessage = error.message;
-      ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
-    });
-    this.createChat(currUID, anotherUID)
+    if (this.state.email) {
+      const currUID = firebase.auth().currentUser.uid;
+      var anotherUID = '';
+      const uidRef = firebase.database().ref('users');
+      await uidRef.orderByChild('email').equalTo(this.state.email).once('value').then((snapshot) => {
+        snapshot.forEach(childSnapshot => {
+          anotherUID = childSnapshot.val().uid;
+        })
+      }).catch((error) => {
+        var errorMessage = error.message;
+        ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+      });
+      if (!anotherUID) {
+        ToastAndroid.show('User not found!', ToastAndroid.SHORT);
+      } else {
+        this.createChat(currUID, anotherUID)
+      }
+    }
   }
 
   createChat = (currUID, anotherUID) => {
@@ -164,7 +170,9 @@ export default class ChatList extends React.Component {
                 titleStyle={style.title}
                 subtitle={<Subtitle message={item.message} style={style.message}/>}
                 rightElement={<TimeDisplay time={item.lastTime} />}
-                onPress={() => Actions.chat({ title: item.name })}
+                onPress={() => {
+                  Actions.chat({ title: item.name, chatID: item.chatID })
+                }}
               />))
           }
         </ScrollView>

@@ -41,7 +41,7 @@ export default class Chat extends React.Component {
   }
 
   parse = (snapshot) => {
-    const { createdAt, text, user } = snapshot.val();
+    const { createdAt, text, user, system } = snapshot.val();
     const { key: id } = snapshot;
     const { key: _id } = snapshot;
 
@@ -51,6 +51,7 @@ export default class Chat extends React.Component {
       createdAt,
       text,
       user,
+      system
     };
     return message;
   };
@@ -68,7 +69,7 @@ export default class Chat extends React.Component {
   };
 
   get ref() {
-    return firebase.database().ref('Messages');
+    return firebase.database().ref('chat_by_id/' + this.props.chatID + '/messages');
   }
 
   get user() {
