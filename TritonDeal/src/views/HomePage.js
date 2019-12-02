@@ -40,7 +40,9 @@ export default class HomePage extends Component {
     const search  = this.state.search;
     return (
       <View style={style.container}>
-        <TopNavBar />
+        { !this.state.searchRes ? 
+        <View>
+        <TopNavBar /> 
         <SearchBar
           platform="android"
           placeholder="Search"
@@ -53,33 +55,46 @@ export default class HomePage extends Component {
           onSubmitEditing={()=>{
             this.setState({searchRes:true});
             this.setState({searchSuggest:false})
-          }}/>
+          }}/>         
           <FlatList
                 data={DATA}
                 renderItem={({item})=>  <ItemDisplay itemName={item.name} imageSource={item.source} tags={item.tags} description={item.description} price={item.price} seller={item.seller} timeleft={item.timeleft} currentBid={item.currentBid}/>
                 }
-                keyExtractor={(item,index)=>index.toString()}/>
-          <Overlay isVisible={this.state.searchRes} fullScreen={true}>
-            <View>
-              <View style={{flexDirection:"row"}}>
-                <Icon type="entypo" name="back" color="#747678" onPress={()=>this.setState({searchRes:false})} containerStyle={style.backIcon}/>
-                <SearchBar platform="android" containerStyle={style.searchBarRes} value={search}
-                        onChangeText={(value)=>{this.updateSearch(value);
-                                      this.setState({searchSuggest:true})}}
-                        value={search}
-                        onClear={()=>this.setState({searchSuggest:false})}
-                        onCancel={()=>this.setState({searchSuggest:false})}
-                        onSubmitEditing={()=>{
-                          this.setState({searchRes:true});
-                          this.setState({searchSuggest:false})
-                        }}/>
-              </View>
-              <FlatList
-                data={SEARCH_RESULT}
-                renderItem={({item})=>  <ItemDisplay itemName={item.name} imageSource={item.source} tags={item.tags} description={item.description} price={item.price} seller={item.seller} timeleft={item.timeleft} currentBid={item.currentBid}/>
-                }/>
-            </View>
-          </Overlay>
+                keyExtractor={(item,index)=>index.toString()}
+
+          /> 
+        </View> :
+        <View>
+          <View style={{flexDirection:"row"}}>
+            <Icon type="entypo" name="back" color="#747678" onPress={()=>this.setState({searchRes:false})} containerStyle={style.backIcon}/>
+            <SearchBar platform="android" containerStyle={style.searchBarRes} value={search}
+                    onChangeText={(value)=>{this.updateSearch(value);
+                                  this.setState({searchSuggest:true})}}
+                    value={search}
+                    onClear={()=>this.setState({searchSuggest:false})}
+                    onCancel={()=>this.setState({searchSuggest:false})}
+                    onSubmitEditing={()=>{
+                      this.setState({searchRes:true});
+                      this.setState({searchSuggest:false})
+                    }}/>
+          </View>
+          <FlatList
+            data={SEARCH_RESULT}
+            renderItem={({item})=> 
+              <ItemDisplay
+                itemName={item.name}
+                imageSource={item.source}
+                tags={item.tags}
+                description={item.description}
+                price={item.price}
+                seller={item.seller}
+                timeleft={item.timeleft}
+                currentBid={item.currentBid}
+                keyExtractor={(item,index)=>index.toString()}
+            />
+            }/>
+        </View>
+          }        
       </View>
     );
   }

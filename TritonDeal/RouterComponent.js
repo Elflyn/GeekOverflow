@@ -5,6 +5,7 @@ import LoginPage from './src/views/LoginPage';
 import SignupPage from './src/views/SignupPage';
 import SplashScreen from './src/views/SplashScreen'
 import HomePage from './src/views/HomePage'
+import ItemDetail from './src/views/ItemDetail'
 import Placeholder from './src/views/Placeholder'
 import ChatList from './src/views/ChatList'
 import Chat from './src/components/Chat'
@@ -194,6 +195,14 @@ export default class RouterComponent extends React.Component {
             component={EditProfile}
             navigationBarStyle={style.nav}
             title="Edit Profile"
+            titleStyle={style.title}
+            renderLeftButton={() => renderBackButton()}
+          />
+           <Scene
+            key="detail"
+            component={ItemDetail}
+            navigationBarStyle={style.nav}
+            title="Detail"
             titleStyle={style.title}
             renderLeftButton={() => renderBackButton()}
           />

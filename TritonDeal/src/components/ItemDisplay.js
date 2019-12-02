@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
-import {Input, Icon, Button,Header,Avatar,Overlay} from 'react-native-elements';
-import {StyleSheet,View,Image,Text,Alert,ScrollView,TouchableOpacity} from 'react-native';
+import {Icon, Avatar} from 'react-native-elements';
+import {StyleSheet, View, Image, Text, Alert, TouchableOpacity} from 'react-native';
 import TopNavBar from '../components/TopNavBar'
 import message from '../message'
+import {Actions} from 'react-native-router-flux'
+
 const TITLE_DISPLAY_OFFSET =20;
 const TAG_DISPLAY_OFFSET =4;
 export default class ItemDisplay extends Component{
@@ -31,8 +33,7 @@ export default class ItemDisplay extends Component{
   }
   render(){
     return(
-        <View>
-        <TouchableOpacity style={style.container} onPress={()=>this.setState({itemDetail:true})} activeOpacity={1}>
+      <TouchableOpacity style={style.container} onPress={() => Actions.detail({...this.props})} activeOpacity={1}>
         <Image source={{uri:this.props.imageSource[0]}}
             style={style.image}/>
         <View style={style.textView}>
@@ -57,67 +58,7 @@ export default class ItemDisplay extends Component{
             </View>
           </View>
         </View>
-        </TouchableOpacity>
-        <Overlay isVisible={this.state.placeBid} onBackdropPress={() => this.setState({ placeBid: false })}
-                 overlayStyle={style.overlay}>
-          <View>
-            <Text style={style.currentBid}>Current bid: {this.props.currentBid}</Text>
-            <Text style={style.enterPrompt}>Enter a higher bid:</Text>
-            <Input leftIcon={{name:"attach-money"}}
-                   keyboardType="numeric"
-                   onChangeText={(num)=>this.setState({newBidNum:num})}/>
-            <View style={style.overlayButton}>
-              <Button title="Place" buttonStyle={style.placeButton} disabled={this.state.newBidNum<=this.props.currentBid}
-                      onPress={()=>{Alert.alert("Great! You own the highest bid so far! Keep an eye on your bid!");
-                                    this.setState({placeBid:false});
-                                    this.setState({itemDetail:false})}}/>
-              <Button title="Cancel" buttonStyle={style.cancelButton}
-                      onPress={()=>this.setState({placeBid:false})}/>
-            </View>
-          </View>
-        </Overlay>
-        <Overlay isVisible={this.state.itemDetail} fullScreen={true}>
-          <View>
-            <TopNavBar />
-            <View style={style.detailTitleRow}>
-              <Text style={style.detailTitle}>{this.props.itemName}</Text>
-              <View style={style.detailTopIcon}>
-              <Button title="Add to chart" buttonStyle={{width:150}} type="clear"/>
-                <Icon name="close" onPress={() => this.setState({ itemDetail: false })} size={28}/>
-              </View>
-            </View>
-            <ScrollView horizontal={true} style={style.imageScroll}>
-              {this.props.imageSource.map((image)=><Image source={{uri:image}} style={style.multiImage}/>)}
-            </ScrollView>
-            <View style={{flexDirection:"row"}}>
-              <Text style={{fontSize:30,marginTop:5}}>${this.props.price}</Text>
-              <View style={{flexDirection:"row-reverse",flex:1}}>
-                <Text style={{marginTop:13,paddingLeft:0}}>{this.props.timeleft} left</Text>
-                <Icon name="timer" iconStyle={{marginTop:11,marginLeft:2}}/>
-                </View>
-            </View>
-            <ScrollView style={{height:160,marginTop:10}}>
-              <View style={style.detailTagsView}>
-                {
-                  this.props.tags.map((tag,i)=>{
-                    return(
-                      <View style={style.detailTag} key={i}>
-                      <Text style={style.detailTagText}>{tag}</Text>
-                      </View>
-                    );
-                  })
-                }
-              </View>
-              <Text style={{fontSize:18,padding:5}}>{this.props.description}</Text>
-            </ScrollView>
-            <View style={{flexDirection:"row", justifyContent: 'center'}}>
-              <Button title="Contact Seller" buttonStyle={{margin:10}}/>
-              <Button type="solid" title="Bid" buttonStyle={{margin:10,width:100}}
-              onPress={()=>this.bidOnClick(this.props.currentBid)} />
-            </View>
-          </View>
-        </Overlay>
-      </View>
+      </TouchableOpacity>
     );
   }
 };
@@ -125,10 +66,8 @@ export default class ItemDisplay extends Component{
 const style = StyleSheet.create({
   container:{
     flexDirection: 'row',
-    borderWidth:1,
-    borderColor:"white",
-    borderRadius:1,
-    elevation:1,
+    backgroundColor:"white",
+    borderRadius:10,
     margin:5,
     padding:2,
     justifyContent:"center"
