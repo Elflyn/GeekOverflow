@@ -89,7 +89,8 @@ export default class HomePage extends Component {
 
 const style = StyleSheet.create({
   container:{
-    margin:10
+    margin: 10,
+      marginBottom: 80,
   },
   searchBar:{
     borderTopEndRadius:80,
