@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {SearchBar,Overlay,Icon,ListItem} from 'react-native-elements'
-import {View,Text,FlatList,StyleSheet, RefreshControl} from 'react-native';
+import {View,Text,FlatList,StyleSheet, RefreshControl, ScrollView} from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
 import TopNavBar from '../components/TopNavBar'
 //TODO:if need to control item title in 30 characters
@@ -22,21 +22,29 @@ const SEARCH_RESULT=[{name:"Car", source :["http://media.wired.com/photos/5d0959
 const suggestedItems=['car','Q60']
 const suggestedTags=['car','used']
 export default class HomePage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+  state = {
     search: '',
     searchRes:false,
-    searchSuggest:false
+    searchSuggest:false,
+    refreshing: false,
     };
-  }
-
+    
   updateSearch = (value) => {
     this.setState({ search:value });
   }
 
+  wait = (timeout) => {
+    return new Promise(resolve => {
+      setTimeout(resolve, timeout);
+    });
+  }
+  onRefresh = () => {
+    this.setState({refreshing: true});
+    this.wait(2000).then(() => this.setState({refreshing: false}));
+  }
 
   render(){
+
     const search  = this.state.search;
     return (
       <View style={style.container}>
@@ -55,14 +63,19 @@ export default class HomePage extends Component {
             onSubmitEditing={()=>{
               this.setState({searchRes:true});
               this.setState({searchSuggest:false})
-            }}/>         
-            <FlatList
-                  data={DATA}
-                  renderItem={({item})=>  <ItemDisplay itemName={item.name} imageSource={item.source} tags={item.tags} description={item.description} price={item.price} seller={item.seller} timeleft={item.timeleft} currentBid={item.currentBid}/>
-                  }
-                  keyExtractor={(item,index)=>index.toString()}
+            }}/>   
+            <ScrollView
+              refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />}
+            >
+              <FlatList
+                data={DATA}
+                renderItem={({item})=>  <ItemDisplay itemName={item.name} imageSource={item.source} tags={item.tags} description={item.description} price={item.price} seller={item.seller} timeleft={item.timeleft} currentBid={item.currentBid}/>
+                }
+                keyExtractor={(item,index)=>index.toString()}
 
-            /> 
+              /> 
+
+            </ScrollView>      
           </View> :
           <View>
             <View style={{flexDirection:"row"}}>
@@ -80,6 +93,7 @@ export default class HomePage extends Component {
             </View>
             <FlatList
               data={SEARCH_RESULT}
+              
               renderItem={({item})=> 
                 <ItemDisplay
                   itemName={item.name}
