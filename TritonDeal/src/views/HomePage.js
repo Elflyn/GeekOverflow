@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {SearchBar,Overlay,Icon,ListItem} from 'react-native-elements'
-import {View,Text,FlatList,StyleSheet,SafeAreaView,TouchableOpacity,StatusBar} from 'react-native';
+import {View,Text,FlatList,StyleSheet, RefreshControl} from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
 import TopNavBar from '../components/TopNavBar'
 //TODO:if need to control item title in 30 characters
@@ -41,59 +41,59 @@ export default class HomePage extends Component {
     return (
       <View style={style.container}>
         { !this.state.searchRes ? 
-        <View>
-        <TopNavBar /> 
-        <SearchBar
-          platform="android"
-          placeholder="Search"
-          onChangeText={(value)=>{this.updateSearch(value);
-                                  this.setState({searchSuggest:true})}}
-          value={search}
-          containerStyle = {style.searchBar}
-          onClear={()=>this.setState({searchSuggest:false})}
-          onCancel={()=>this.setState({searchSuggest:false})}
-          onSubmitEditing={()=>{
-            this.setState({searchRes:true});
-            this.setState({searchSuggest:false})
-          }}/>         
-          <FlatList
-                data={DATA}
-                renderItem={({item})=>  <ItemDisplay itemName={item.name} imageSource={item.source} tags={item.tags} description={item.description} price={item.price} seller={item.seller} timeleft={item.timeleft} currentBid={item.currentBid}/>
-                }
-                keyExtractor={(item,index)=>index.toString()}
+          <View>
+          <TopNavBar /> 
+          <SearchBar
+            platform="android"
+            placeholder="Search"
+            onChangeText={(value)=>{this.updateSearch(value);
+                                    this.setState({searchSuggest:true})}}
+            value={search}
+            containerStyle = {style.searchBar}
+            onClear={()=>this.setState({searchSuggest:false})}
+            onCancel={()=>this.setState({searchSuggest:false})}
+            onSubmitEditing={()=>{
+              this.setState({searchRes:true});
+              this.setState({searchSuggest:false})
+            }}/>         
+            <FlatList
+                  data={DATA}
+                  renderItem={({item})=>  <ItemDisplay itemName={item.name} imageSource={item.source} tags={item.tags} description={item.description} price={item.price} seller={item.seller} timeleft={item.timeleft} currentBid={item.currentBid}/>
+                  }
+                  keyExtractor={(item,index)=>index.toString()}
 
-          /> 
-        </View> :
-        <View>
-          <View style={{flexDirection:"row"}}>
-            <Icon type="entypo" name="back" color="#747678" onPress={()=>this.setState({searchRes:false})} containerStyle={style.backIcon}/>
-            <SearchBar platform="android" containerStyle={style.searchBarRes} value={search}
-                    onChangeText={(value)=>{this.updateSearch(value);
-                                  this.setState({searchSuggest:true})}}
-                    value={search}
-                    onClear={()=>this.setState({searchSuggest:false})}
-                    onCancel={()=>this.setState({searchSuggest:false})}
-                    onSubmitEditing={()=>{
-                      this.setState({searchRes:true});
-                      this.setState({searchSuggest:false})
-                    }}/>
+            /> 
+          </View> :
+          <View>
+            <View style={{flexDirection:"row"}}>
+              <Icon type="entypo" name="back" color="#747678" onPress={()=>this.setState({searchRes:false})} containerStyle={style.backIcon}/>
+              <SearchBar platform="android" containerStyle={style.searchBarRes} value={search}
+                      onChangeText={(value)=>{this.updateSearch(value);
+                                    this.setState({searchSuggest:true})}}
+                      value={search}
+                      onClear={()=>this.setState({searchSuggest:false})}
+                      onCancel={()=>this.setState({searchSuggest:false})}
+                      onSubmitEditing={()=>{
+                        this.setState({searchRes:true});
+                        this.setState({searchSuggest:false})
+                      }}/>
+            </View>
+            <FlatList
+              data={SEARCH_RESULT}
+              renderItem={({item})=> 
+                <ItemDisplay
+                  itemName={item.name}
+                  imageSource={item.source}
+                  tags={item.tags}
+                  description={item.description}
+                  price={item.price}
+                  seller={item.seller}
+                  timeleft={item.timeleft}
+                  currentBid={item.currentBid}
+                  keyExtractor={(item,index)=>index.toString()}
+              />
+              }/>
           </View>
-          <FlatList
-            data={SEARCH_RESULT}
-            renderItem={({item})=> 
-              <ItemDisplay
-                itemName={item.name}
-                imageSource={item.source}
-                tags={item.tags}
-                description={item.description}
-                price={item.price}
-                seller={item.seller}
-                timeleft={item.timeleft}
-                currentBid={item.currentBid}
-                keyExtractor={(item,index)=>index.toString()}
-            />
-            }/>
-        </View>
           }        
       </View>
     );
