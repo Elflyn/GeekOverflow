@@ -26,7 +26,6 @@ class Post extends Component {
 
   state = {
     title: '',
-    bid: false,
     date: '10-10-2020',
     condition: 'good',
     showDatePicker: false,
@@ -55,7 +54,6 @@ class Post extends Component {
     this.setState({
       isVisible: false, 
       title: '',
-      bid: false,
       date: '10-10-2020',
       condition: 'good',
       showDatePicker: false,
@@ -77,13 +75,16 @@ class Post extends Component {
   handleNewPost = () => {
     const user = firebase.auth().currentUser
     const postRef = firebase.database().ref('post')
-    const {bid, dateValue, condition, description, title, tags, photos, price} = this.state
+    const {dateValue, condition, description, title, tags, photos, price} = this.state
     if (title === '') {
       this.setState({isVisible: true, dialogText: message.POST_MISSING_TITLE, handleDialog: this.closeDialog})
-    } else {
+    } else if(tags.length === 0){
+      this.setState({isVisible: true, dialogText: message.POST_MISSING_TAG, handleDialog: this.closeDialog})
+    } else if (photos.length === 0){
+      this.setState({isVisible: true, dialogText: message.POST_MISSING_PHOTO, handleDialog: this.closeDialog})
+    }else {
       this.setState({finished:false})
       postRef.push({
-        "bid": bid,
         "date": dateValue,
         "condition": condition,
         "description": description,
@@ -213,13 +214,6 @@ class Post extends Component {
                 conditions.map((condition, index) => <Picker.Item value={condition} label={condition} key={index} />)
               }
             </Picker>}
-          />
-          <ListItem 
-            title="Bid"
-            switch={{
-              value: this.state.bid,
-              onValueChange: () => this.setState({bid: !this.state.bid})
-            }}
           />
           <ListItem 
             title="Expiration Date"

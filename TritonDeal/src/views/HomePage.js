@@ -3,18 +3,12 @@ import {SearchBar,Overlay,Icon,ListItem} from 'react-native-elements'
 import {View,Text,FlatList,StyleSheet, RefreshControl, ScrollView} from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
 import TopNavBar from '../components/TopNavBar'
+import firebase from '@react-native-firebase/app';
+import '@react-native-firebase/database';
+import '@react-native-firebase/auth';
+import '@react-native-firebase/storage';
+
 //TODO:if need to control item title in 30 characters
-const DATA = [{name:"Car", source :["http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg","https://upload.wikimedia.org/wikipedia/commons/3/3c/Infiniti_Q60_2.0t_P4250831.jpg"],
-              tags:["car","used"], description:"This is a 2017 used Infinity Q60, the condition is very new.Aside from a redesign, the 2017 Q60 received many major upgrades like a lower and wider body, introduction of second generation Direct Adaptive Steering, Drive Mode Selector with custom settings profile, hydraulic electronic rack and pinion power steering system standard (2.0t), introduction of Dynamic Digital Suspension, retuned seven speed automatic transmission, Active Grille Shutter in V6 engine models, and for the first time, all new turbocharged engines. The Q60 Convertible was discontinued for the second generation.",price:10000,seller:"LL",timeleft:"4d 2h",currentBid:7000},
-              {name:"Car", source :["http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg"],
-              tags:["car","used","bla"], description:"This is a 2017 used Infinity Q60, the condition is very new",price:10000,seller:"LL",timeleft:"4d 2h",currentBid:7000},
-              {name:"Car", source :["http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg"],
-               tags:["car","used","bla"], description:"This is a 2017 used Infinity Q60, the condition is very new",price:10000,seller:"LL",timeleft:"4d 2h",currentBid:7000},
-               {name:"Car", source :["http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg"],
-                             tags:["car","used","bla"], description:"This is a 2017 used Infinity Q60, the condition is very new",price:10000,seller:"LL",timeleft:"4d 2h",currentBid:7000},
-                             {name:"Car", source :["http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg"],
-                                           tags:["car","used","bla"], description:"This is a 2017 used Infinity Q60, the condition is very new",price:10000,seller:"LL",timeleft:"4d 2h",currentBid:7000}
-            ]
 const SEARCH_RESULT=[{name:"Car", source :["http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg","https://upload.wikimedia.org/wikipedia/commons/3/3c/Infiniti_Q60_2.0t_P4250831.jpg"],
               tags:["car","used"], description:"This is a 2017 used Infinity Q60, the condition is very new.Aside from a redesign, the 2017 Q60 received many major upgrades like a lower and wider body, introduction of second generation Direct Adaptive Steering, Drive Mode Selector with custom settings profile, hydraulic electronic rack and pinion power steering system standard (2.0t), introduction of Dynamic Digital Suspension, retuned seven speed automatic transmission, Active Grille Shutter in V6 engine models, and for the first time, all new turbocharged engines. The Q60 Convertible was discontinued for the second generation.",price:10000,seller:"LL",timeleft:"4d 2h",currentBid:7000},
               {name:"Car", source :["http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg"],
@@ -27,10 +21,36 @@ export default class HomePage extends Component {
     searchRes:false,
     searchSuggest:false,
     refreshing: false,
+    data: []
     };
     
   updateSearch = (value) => {
     this.setState({ search:value });
+  }
+  
+  
+  getPost = async () => {
+    let arr = []
+    await firebase.database().ref('post').once('value').then(async data => {
+      const d = JSON.parse(JSON.stringify(data))
+      for (var key in d) {
+        const post = d[key]
+        const avatar = await firebase.storage().ref('avatar').child(post.user).getDownloadURL();
+        let i = 0;
+        let p = [];
+        for(; i < post.photos; i++) {
+          const photo = await firebase.storage().ref('postImage').child(`${key}-${i}`).getDownloadURL();
+          p.push(photo);
+        }
+        // this.setState({data: [...this.state.data, {title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller:avatar}]})
+        arr.push({title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller:avatar})
+      }
+    })
+    this.setState({data: arr})
+  }
+  
+  componentDidMount = () => {
+    this.getPost()
   }
 
   wait = (timeout) => {
@@ -40,7 +60,7 @@ export default class HomePage extends Component {
   }
   onRefresh = () => {
     this.setState({refreshing: true});
-    this.wait(2000).then(() => this.setState({refreshing: false}));
+    this.wait(2000).then(() => {this.getPost(); this.setState({refreshing: false})});
   }
 
   render(){
@@ -67,14 +87,15 @@ export default class HomePage extends Component {
             <ScrollView
               refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />}
             >
-              <FlatList
-                data={DATA}
-                renderItem={({item})=>  <ItemDisplay itemName={item.name} imageSource={item.source} tags={item.tags} description={item.description} price={item.price} seller={item.seller} timeleft={item.timeleft} currentBid={item.currentBid}/>
-                }
-                keyExtractor={(item,index)=>index.toString()}
-
-              /> 
-
+              {
+                this.state.data.map((item, index) => <ItemDisplay itemName={item.title}
+                    imageSource={item.source}
+                    tags={item.tags}
+                    description={item.description}
+                    price={item.price}
+                    seller={item.seller}
+                  />)
+              }
             </ScrollView>      
           </View> :
           <View>
@@ -96,14 +117,12 @@ export default class HomePage extends Component {
               
               renderItem={({item})=> 
                 <ItemDisplay
-                  itemName={item.name}
+                  itemName={item.title}
                   imageSource={item.source}
                   tags={item.tags}
                   description={item.description}
                   price={item.price}
                   seller={item.seller}
-                  timeleft={item.timeleft}
-                  currentBid={item.currentBid}
                   keyExtractor={(item,index)=>index.toString()}
               />
               }/>

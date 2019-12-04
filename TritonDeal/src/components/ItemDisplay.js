@@ -32,7 +32,7 @@ export default class ItemDisplay extends Component{
           </View>
           <Text style={style.price}>${this.props.price}</Text>
           <View style={style.bottomStyle}>
-            <Avatar rounded title={this.props.seller} size={35}/>
+            <Avatar rounded source={{uri: this.props.seller}} size={35}/>
           </View>
         </View>
       </TouchableOpacity>
@@ -47,7 +47,8 @@ const style = StyleSheet.create({
     borderRadius:10,
     margin:5,
     padding:2,
-    justifyContent:"center"
+    justifyContent:"center",
+    marginRight: 15,
   },
   textView:{
     flex:2,
