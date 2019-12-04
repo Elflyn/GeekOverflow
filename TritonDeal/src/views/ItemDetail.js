@@ -1,29 +1,8 @@
 import React, {Component} from 'react';
-import {Input, Icon, Button, Overlay} from 'react-native-elements';
-import {StyleSheet,View,Image,Text,Alert,ScrollView} from 'react-native';
+import {Icon, Button} from 'react-native-elements';
+import {StyleSheet, View, Image, Text, ScrollView} from 'react-native';
 
 export default class ItemDetail extends Component {
-  constructor(){
-    super();
-    this.state={
-      //flag if the bid overlay shows
-      placeBid:false,
-      //if newBidNum<currentBid, place button is not available
-      newBidNum:0,
-    }
-    this.bidOnClick=this.bidOnClick.bind(this)
-  }
-
-  bidOnClick(currentBid)
-  {
-      Alert.alert('Current Bid: $'+currentBid,message.BID_PROMPT,
-      [
-        {text:'Join', onPress:()=>{
-          this.setState({placeBid:true})
-        }},
-        {text:'Cancel'}
-      ]);
-  }
   render() {
     return (
       <View>
@@ -31,7 +10,6 @@ export default class ItemDetail extends Component {
           <View style={style.detailTitleRow}>
             <Text style={style.detailTitle}>{this.props.itemName}</Text>
             <View style={style.detailTopIcon}>
-            <Button title="Add to chart" titleStyle={{fontSize: 20}} buttonStyle={{width:150}} type="clear"/>
           </View>
           </View>
           <ScrollView horizontal={true} style={style.imageScroll}>
@@ -39,10 +17,6 @@ export default class ItemDetail extends Component {
           </ScrollView>
           <View style={{flexDirection:"row"}}>
             <Text style={{fontSize:30,marginTop:5}}>${this.props.price}</Text>
-            <View style={{flexDirection:"row-reverse",flex:1}}>
-              <Text style={{marginTop:13,paddingLeft:0}}>{this.props.timeleft} left</Text>
-              <Icon name="timer" iconStyle={{marginTop:11,marginLeft:2}}/>
-              </View>
           </View>
           <ScrollView style={{height:160,marginTop:10}}>
             <View style={style.detailTagsView}>
@@ -60,29 +34,9 @@ export default class ItemDetail extends Component {
           </ScrollView>
           <View style={{flexDirection:"row", justifyContent: 'center'}}>
             <Button title="Contact Seller" buttonStyle={{margin:10}}/>
-            <Button type="solid" title="Bid" buttonStyle={{margin:10,width:100}}
-            onPress={()=>this.bidOnClick(this.props.currentBid)} />
+            <Button title="Add to Chart" buttonStyle={{margin:10}}/>
           </View>
         </View>
-
-        <Overlay isVisible={this.state.placeBid} onBackdropPress={() => this.setState({ placeBid: false })}
-        overlayStyle={style.overlay}>
-        <View>
-        <Text style={style.currentBid}>Current bid: {this.props.currentBid}</Text>
-        <Text style={style.enterPrompt}>Enter a higher bid:</Text>
-        <Input leftIcon={{name:"attach-money"}}
-                keyboardType="numeric"
-                onChangeText={(num)=>this.setState({newBidNum:num})}/>
-        <View style={style.overlayButton}>
-          <Button title="Place" buttonStyle={style.placeButton} disabled={this.state.newBidNum<=this.props.currentBid}
-                  onPress={()=>{Alert.alert("Great! You own the highest bid so far! Keep an eye on your bid!");
-                                this.setState({placeBid:false});
-                                this.setState({itemDetail:false})}}/>
-          <Button title="Cancel" buttonStyle={style.cancelButton}
-                  onPress={()=>this.setState({placeBid:false})}/>
-        </View>
-        </View>
-        </Overlay>
       </View>
     )
   }
@@ -153,39 +107,6 @@ const style = StyleSheet.create({
     height:37,
     width:50,
     borderRadius:5,
-  },
-  timer:{
-    marginLeft:15,
-    marginTop:7,
-    marginRight:0
-  },
-  countdown:{
-    flex:1,
-    margin:10
-  },
-  overlay:{
-    width:250,
-    height:250
-  },
-  currentBid:{
-    fontSize:20,
-    margin:10
-  },
-  enterPrompt:{
-    fontSize:17,
-    margin:10
-  },
-  overlayButton:{
-    flexDirection:"row",
-    alignItems:"center",
-    justifyContent:"space-around",
-    marginTop:20
-  },
-  placeButton:{
-    width:70
-  },
-  cancelButton:{
-    width:70
   },
   detailTitleRow:{
     flexDirection:"row",

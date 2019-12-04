@@ -1,36 +1,17 @@
 import React, {Component} from 'react';
 import {Icon, Avatar} from 'react-native-elements';
 import {StyleSheet, View, Image, Text, Alert, TouchableOpacity} from 'react-native';
-import TopNavBar from '../components/TopNavBar'
-import message from '../message'
 import {Actions} from 'react-native-router-flux'
 
 const TITLE_DISPLAY_OFFSET =20;
 const TAG_DISPLAY_OFFSET =4;
 export default class ItemDisplay extends Component{
-  constructor(){
-    super();
-    this.state={
-      //flag if the bid overlay shows
-      placeBid:false,
-      //if newBidNum<currentBid, place button is not available
-      newBidNum:0,
-      //flag if show the item detail
-      itemDetail:false
-    }
-    this.bidOnClick=this.bidOnClick.bind(this)
+
+  state={
+    //flag if show the item detail
+    itemDetail:false
   }
 
-  bidOnClick(currentBid)
-  {
-      Alert.alert('Current Bid: $'+currentBid,message.BID_PROMPT,
-      [
-        {text:'Join', onPress:()=>{
-          this.setState({placeBid:true})
-        }},
-        {text:'Cancel'}
-      ]);
-  }
   render(){
     return(
       <TouchableOpacity style={style.container} onPress={() => Actions.detail({...this.props})} activeOpacity={1}>
@@ -52,10 +33,6 @@ export default class ItemDisplay extends Component{
           <Text style={style.price}>${this.props.price}</Text>
           <View style={style.bottomStyle}>
             <Avatar rounded title={this.props.seller} size={35}/>
-            <View style={style.rightView}>
-              <Text style={style.countdown}>{this.props.timeleft} left</Text>
-              <Icon name="timer" iconStyle={style.timer}/>
-            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -127,82 +104,4 @@ const style = StyleSheet.create({
     width:50,
     borderRadius:5,
   },
-  timer:{
-    marginLeft:15,
-    marginTop:7,
-    marginRight:0
-  },
-  countdown:{
-    flex:1,
-    margin:10
-  },
-  overlay:{
-    width:250,
-    height:250
-  },
-  currentBid:{
-    fontSize:20,
-    margin:10
-  },
-  enterPrompt:{
-    fontSize:17,
-    margin:10
-  },
-  overlayButton:{
-    flexDirection:"row",
-    alignItems:"center",
-    justifyContent:"space-around",
-    marginTop:20
-  },
-  placeButton:{
-    width:70
-  },
-  cancelButton:{
-    width:70
-  },
-  detailTitleRow:{
-    flexDirection:"row",
-  },
-  detailTitle:{
-    flex:1,
-    fontSize:30,
-    margin:5
-  },
-  detailTopIcon:{
-    flex:0.2,
-    flexDirection:"row",
-    justifyContent:"flex-end",
-    marginTop:12,
-  },
-  imageScroll:{
-    borderBottomWidth:1,
-    borderColor:"#747678",
-    padding:2,
-  },
-  multiImage:{
-    width:370,
-    height:270,
-    margin:10,
-    alignSelf:"center"
-  },
-  detailTagsView:{
-    //flex:1,
-    paddingLeft:5,
-    paddingRight:5,
-    flexDirection:"row",
-    flexWrap:"wrap",
-    //justifyContent:"space-between"
-  },
-  detailTag:{
-    padding:1,
-    marginTop:5,
-    marginRight:10,
-    borderRadius:5,
-    backgroundColor:"#B6B1A9",
-  },
-  detailTagText:{
-    color:"black",
-    fontSize:22
-  },
-
 });
