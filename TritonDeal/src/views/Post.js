@@ -40,7 +40,8 @@ class Post extends Component {
     dialogText: '',
     handleDialog: this.closeDialog,
     photos: [],
-    finished: true
+    finished: true,
+    price: 0,
   }
 
   closeDialog = () => {
@@ -68,14 +69,15 @@ class Post extends Component {
       dialogText: '',
       handleDialog: this.closeDialog,
       photos: [],
-      finished: true
+      finished: true,
+      price: 0
     });
   }
 
   handleNewPost = () => {
     const user = firebase.auth().currentUser
     const postRef = firebase.database().ref('post')
-    const {bid, dateValue, condition, description, title, tags, photos} = this.state
+    const {bid, dateValue, condition, description, title, tags, photos, price} = this.state
     if (title === '') {
       this.setState({isVisible: true, dialogText: message.POST_MISSING_TITLE, handleDialog: this.closeDialog})
     } else {
@@ -89,7 +91,8 @@ class Post extends Component {
         "tags": tags,
         "user": user.uid,
         "active": true,
-        "photos": photos.length
+        "photos": photos.length,
+        "price": price,
       }).then(snap => 
         { const key = snap.key;
           photos.forEach((photo, i) => {
@@ -160,6 +163,8 @@ class Post extends Component {
           <View style={style.section}>
             <Text style={style.title}>Item Title:</Text>
             <Input placeholder="title" onChangeText={value => this.setState({title: value})} />
+            <Text style={style.title}>Price:</Text>
+            <Input placeholder="Price" onChangeText={value => this.setState({price: value})} />
             <Divider style={style.divider}/>
           </View>
           <View style={style.section}>
