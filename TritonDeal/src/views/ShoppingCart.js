@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Text} from 'react-native';
+import { ScrollView, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements'
 import ItemDisplay from '../components/ItemDisplay'
 import firebase from '@react-native-firebase/app';
@@ -43,7 +43,7 @@ export default class ShoppingCart extends React.Component {
       <ScrollView>
 
         { this.state.post.length === 0 ? 
-          <Text style={{textAlign: 'center'}}>Your cart is empty.</Text> :
+          <Text style={style.text}>Your cart is empty.</Text> :
           this.state.post.map((item, index) => 
             <ItemDisplay 
               itemName={item.title}
@@ -60,3 +60,12 @@ export default class ShoppingCart extends React.Component {
     )
   }
 }
+
+const style = StyleSheet.create({
+  text:{
+    textAlign: 'center',
+    color: 'gray',
+    fontSize: 18,
+    marginTop: 50
+  }
+})

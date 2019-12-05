@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {SearchBar,Overlay,Icon,ListItem} from 'react-native-elements'
-import {View,Text,FlatList,StyleSheet, RefreshControl, ScrollView, Dimensions} from 'react-native';
+import {View,TouchableOpacity,FlatList,StyleSheet, RefreshControl, ScrollView, Dimensions} from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
 import TopNavBar from '../components/TopNavBar'
 import firebase from '@react-native-firebase/app';
@@ -88,11 +88,14 @@ export default class HomePage extends Component {
                   this.setState({ searchRes: true });
                   this.setState({ searchSuggest: false })
                 }} />
-              <Icon type="entypo" name="shopping-cart" color="#006A96" containerStyle={style.backIcon} size={30} onPress={() => Actions.cart()}/>
+                <TouchableOpacity
+                  onPress={() => Actions.cart()}>
+                  <Icon type="entypo" name="shopping-cart" color="#006A96" containerStyle={style.backIcon} size={30} />
+                </TouchableOpacity>
             </View>
+            <View style={{marginBottom: 115}}>
             <ScrollView
               refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />}
-              style={{ height: Dimensions.get('window').height }}
             >
               {
                 this.state.data.map((item, index) => 
@@ -109,6 +112,7 @@ export default class HomePage extends Component {
                   />)
               }
             </ScrollView>      
+            </View>
           </View> :
           <View>
             <View style={{flexDirection:"row"}}>
