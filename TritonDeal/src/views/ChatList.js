@@ -40,7 +40,7 @@ export default class ChatList extends React.Component {
   parse = async (snapshot) => {
     const { chatID: chatID } = snapshot.val();
     const chatRef = firebase.database().ref('chat_by_id');
-    var title, message, lastTime, anotherUID;
+    var title, message, lastTime, anotherUID, imgURI, itemName, price, lastRead, lastBy;
     await chatRef.orderByKey().equalTo(chatID).once('value').then(async (snapshot) => {
       snapshot.forEach(async childSnapshot => {
         if (childSnapshot.val().user1 === firebase.auth().currentUser.uid) {
@@ -54,6 +54,8 @@ export default class ChatList extends React.Component {
         imgURI = childSnapshot.val().img;
         itemName = childSnapshot.val().itemName;
         price = childSnapshot.val().price;
+        lastRead = childSnapshot.val().lastRead;
+        lastBy = childSnapshot.val().lastBy;
       });
     }).catch((error) => {
       var errorMessage = error.message;
@@ -69,7 +71,10 @@ export default class ChatList extends React.Component {
       imgURI: imgURI,
       itemName: itemName,
       price: price,
-      read: false
+      read: lastRead
+    }
+    if (lastBy == firebase.auth().currentUser.uid) {
+      chatListItem.read = true;
     }
     return chatListItem;
   };
@@ -126,8 +131,13 @@ export default class ChatList extends React.Component {
   }
 
   refOn = async (callback) => {
-    var list_num = this.state.list.length;
-    var event_count = 0
+    var list_num;
+    if (this.props.initList.length) {
+      list_num = this.props.initList.length;
+    } else {
+      list_num = 0;
+    }
+    var event_count = 0;
     this.chatListRef.on('child_added', async snapshot => {
       if (event_count >= list_num) {
         callback(await this.parse(snapshot));
@@ -180,7 +190,8 @@ export default class ChatList extends React.Component {
       lastTime: this.timestamp,
       img: firstImgUrl,
       itemName: itemName,
-      price: price
+      price: price,
+      lastRead: false
     }
     const chatRef = this.chatByIdRef.push(chat);
     const chatListRef = firebase.database().ref('user_to_chat');
@@ -225,6 +236,7 @@ export default class ChatList extends React.Component {
         >
           {
             this.state.list.map((item, i) => (
+              (!item.read) ?
               <ListItem
                 key={i}
                 leftAvatar={{ size: 65, source: { uri: item.avatar } }}
@@ -234,8 +246,22 @@ export default class ChatList extends React.Component {
                 rightAvatar={{ size: 65, source: { uri: item.imgURI } }}
                 onPress={() => {
                   Actions.chat({ title: item.name, chatID: item.chatID, imgURI: item.imgURI, itemName: item.itemName, price: item.price })
+                  firebase.database().ref('chat_by_id/' + item.chatID).update({lastRead: true});
                 }}
-              />))
+                badge
+              /> :
+                <ListItem
+                  key={i}
+                  leftAvatar={{ size: 65, source: { uri: item.avatar } }}
+                  title={item.name}
+                  titleStyle={style.title}
+                  subtitle={<Subtitle message={item.message} timeString={getTimeString(item.lastTime)} />}
+                  rightAvatar={{ size: 65, source: { uri: item.imgURI } }}
+                  onPress={() => {
+                    Actions.chat({ title: item.name, chatID: item.chatID, imgURI: item.imgURI, itemName: item.itemName, price: item.price })
+                  }}
+                />
+              ))
           }
         </ScrollView>
         <Overlay style={style.box}

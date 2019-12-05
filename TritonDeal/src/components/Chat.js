@@ -76,7 +76,7 @@ export default class Chat extends React.Component {
       this.ref.push(message);
     }
     const rootRef = firebase.database().ref('chat_by_id/' + this.props.chatID);
-    rootRef.update({ lastText: messages[messages.length - 1].text, lastTime: this.timestamp })
+    rootRef.update({ lastText: messages[messages.length - 1].text, lastTime: this.timestamp, lastRead: false, lastBy: firebase.auth().currentUser.uid })
   };
 
   get ref() {
