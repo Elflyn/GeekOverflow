@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {SearchBar,Overlay,Icon,ListItem} from 'react-native-elements'
-import {View,Text,FlatList,StyleSheet, RefreshControl, ScrollView} from 'react-native';
+import {View,Text,FlatList,StyleSheet, RefreshControl, ScrollView, Dimensions} from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
 import TopNavBar from '../components/TopNavBar'
 import firebase from '@react-native-firebase/app';
@@ -70,39 +70,48 @@ export default class HomePage extends Component {
       <View style={style.container}>
         { !this.state.searchRes ? 
           <View>
-          <TopNavBar /> 
-          <SearchBar
-            platform="android"
-            placeholder="Search"
-            onChangeText={(value)=>{this.updateSearch(value);
-                                    this.setState({searchSuggest:true})}}
-            value={search}
-            containerStyle = {style.searchBar}
-            onClear={()=>this.setState({searchSuggest:false})}
-            onCancel={()=>this.setState({searchSuggest:false})}
-            onSubmitEditing={()=>{
-              this.setState({searchRes:true});
-              this.setState({searchSuggest:false})
-            }}/>   
+            <View style={{ flexDirection: "row", alignItems: 'center' }}>
+              <SearchBar
+                platform="android"
+                placeholder="Search"
+                inputStyle={{ paddingTop: 2, paddingBottom: 8, paddingLeft: 0 }}
+                leftIconContainerStyle={{ paddingTop: 2, paddingBottom: 6 }}
+                onChangeText={(value) => {
+                  this.updateSearch(value);
+                  this.setState({ searchSuggest: true })
+                }}
+                value={search}
+                containerStyle={style.searchBar}
+                onClear={() => this.setState({ searchSuggest: false })}
+                onCancel={() => this.setState({ searchSuggest: false })}
+                onSubmitEditing={() => {
+                  this.setState({ searchRes: true });
+                  this.setState({ searchSuggest: false })
+                }} />
+              <Icon type="entypo" name="shopping-cart" color="#006A96" containerStyle={style.backIcon} size={30}/>
+            </View>
             <ScrollView
               refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />}
+              style={{ height: Dimensions.get('window').height }}
             >
               {
-                this.state.data.map((item, index) => <ItemDisplay itemName={item.title}
-                    imageSource={item.source}
-                    tags={item.tags}
-                    description={item.description}
-                    price={item.price}
-                    seller={item.seller}
-                    sellerUID={item.sellerUID}
-                    username={item.username}
+                this.state.data.map((item, index) => 
+                <ItemDisplay 
+                  itemName={item.title}
+                  imageSource={item.source}
+                  tags={item.tags}
+                  description={item.description}
+                  price={item.price}
+                  seller={item.seller}
+                  sellerUID={item.sellerUID}
+                  username={item.username}
                   />)
               }
             </ScrollView>      
           </View> :
           <View>
             <View style={{flexDirection:"row"}}>
-              <Icon type="entypo" name="back" color="#747678" onPress={()=>this.setState({searchRes:false})} containerStyle={style.backIcon}/>
+              <Icon type="entypo" name="back" color="#747678" onPress={()=>this.setState({searchRes:false})} containerStyle={style.backIcon} />
               <SearchBar platform="android" containerStyle={style.searchBarRes} value={search}
                       onChangeText={(value)=>{this.updateSearch(value);
                                     this.setState({searchSuggest:true})}}
@@ -149,7 +158,9 @@ const style = StyleSheet.create({
     borderBottomLeftRadius:80,
     backgroundColor:"#ddd",
     height:50,
-    margin:5
+    margin:5,
+    marginBottom: 10,
+    width: Dimensions.get('window').width - 70
   },
   searchBarRes:{
     borderTopEndRadius:80,
@@ -162,7 +173,7 @@ const style = StyleSheet.create({
     margin:5
   },
   backIcon:{
-    marginTop:20
+    paddingLeft: 8
   }
 
 });

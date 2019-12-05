@@ -180,11 +180,11 @@ export default class ChatList extends React.Component {
     const chatListRef = firebase.database().ref('user_to_chat');
     chatListRef.child(currUID).push({
       chatID: chatRef.key,
-      anotherUID: anotherUID
+      //anotherUID: anotherUID
     });
     chatListRef.child(anotherUID).push({
       chatID: chatRef.key,
-      anotherUID: currUID
+      //anotherUID: currUID
     });
     return chatRef.key;
   }

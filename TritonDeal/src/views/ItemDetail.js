@@ -11,9 +11,9 @@ export default class ItemDetail extends Component {
 
   componentWillMount = async () => {
     const chatListRef = firebase.database().ref('user_to_chat/' + firebase.auth().currentUser.uid);
-    await chatListRef.orderByChild('anotherUID').equalTo(this.props.sellerUID).once('value').then((snapshot) => {
+    await chatListRef.orderByKey().equalTo(this.props.sellerUID).once('value').then((snapshot) => {
       snapshot.forEach(childSnapshot => {
-        this._chatID = childSnapshot.val().chatID;
+        this._chatID = childSnapshot.val().key;
       })
     }).catch(error => {
       console.log(error.message);
@@ -49,24 +49,32 @@ export default class ItemDetail extends Component {
             </View>
             <Text style={{fontSize:18,padding:5}}>{this.props.description}</Text>
           </ScrollView>
-          <View style={{flexDirection:"row", justifyContent: 'center'}}>
-            <Button title="Contact Seller" buttonStyle={{margin:10}} onPress={() => {
-              var chatID;
-              if (!this._chatID) {
-                const cl = new ChatList;
-                chatID = cl.createChat(firebase.auth().currentUser.uid, this.props.sellerUID, this.props.imageSource[0], this.props.itemName, this.props.price);
-              } else {
-                chatID = this._chatID;
-              }
-              Actions._chatList();
-              Actions.chat({ title: this.props.username, chatID: chatID, imgURI: this.props.imageSource[0], itemName: this.props.itemName, price: this.props.price })
-            }}/>
-            <Button title="Add to Chart" buttonStyle={{margin:10}}/>
-          </View>
+          <ActionButtons passProps={this.props}/>
         </View>
       </View>
     )
   }
+}
+
+const ActionButtons = (passProps) => {
+  return (passProps.sellerUID === firebase.auth().currentUser.uid) ?
+    <View style={{ flexDirection: "row", justifyContent: 'center' }}>
+      <Button title="Contact Seller" buttonStyle={{ margin: 10 }} onPress={() => {
+        var chatID;
+        if (!this._chatID) {
+          const cl = new ChatList;
+          chatID = cl.createChat(firebase.auth().currentUser.uid, passProps.sellerUID, passProps.imageSource[0], passProps.itemName, passProps.price);
+        } else {
+          chatID = this._chatID;
+        }
+        Actions._chatList();
+        Actions.chat({ title: passProps.username, chatID: chatID, imgURI: passProps.imageSource[0], itemName: passProps.itemName, price: passProps.price })
+      }} />
+      <Button title="Add to Cart" buttonStyle={{ margin: 10 }} />
+    </View>
+    : <View style={{ flexDirection: "row", justifyContent: 'center' }}>
+      <Button title="Cancel this listing" buttonStyle={{ margin: 10 }} />
+    </View>
 }
 
 const style = StyleSheet.create({
