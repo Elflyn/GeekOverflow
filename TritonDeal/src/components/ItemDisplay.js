@@ -13,15 +13,16 @@ export default class ItemDisplay extends Component{
   }
 
   render(){
+  const {itemName, imageSource, tags, description, price, seller, sellerUID, username, postKey} = this.props
     return(
-      <TouchableOpacity style={style.container} onPress={() => Actions.detail({...this.props})} activeOpacity={1}>
+      <TouchableOpacity style={style.container} onPress={() => Actions.detail({sellerUID: sellerUID, imageSource: imageSource, description: description, username: username, postKey: postKey, price: price, tags: tags, itemName: itemName})} activeOpacity={1}>
         <Image source={{uri:this.props.imageSource[0]}}
             style={style.image}/>
         <View style={style.textView}>
-          <Text style={style.itemTitle}>{this.props.itemName.slice(0,TITLE_DISPLAY_OFFSET)}</Text>
+          <Text style={style.itemTitle}>{itemName.slice(0,TITLE_DISPLAY_OFFSET)}</Text>
           <View style={style.tagsView}>
             {
-              this.props.tags.slice(0,TAG_DISPLAY_OFFSET).map((tag,i)=>{
+              tags.slice(0,TAG_DISPLAY_OFFSET).map((tag,i)=>{
                 return(
                   <View style={style.tag} key={i}>
                   <Text style={style.tagText}>{tag}</Text>
@@ -30,9 +31,9 @@ export default class ItemDisplay extends Component{
               })
             }
           </View>
-          <Text style={style.price}>${this.props.price}</Text>
+          <Text style={style.price}>${price}</Text>
           <View style={style.bottomStyle}>
-            <Avatar rounded source={{uri: this.props.seller}} size={35}/>
+            <Avatar rounded source={{uri: seller}} size={35}/>
           </View>
         </View>
       </TouchableOpacity>

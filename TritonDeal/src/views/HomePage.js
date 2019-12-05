@@ -42,8 +42,7 @@ export default class HomePage extends Component {
           const photo = await firebase.storage().ref('postImage').child(`${key}-${i}`).getDownloadURL();
           p.push(photo);
         }
-        // this.setState({data: [...this.state.data, {title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller:avatar}]})
-        arr.push({title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller: avatar, sellerUID: post.user, username: post.username})
+        arr.push({title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller: avatar, sellerUID: post.user, username: post.username, key: key})
       }
     })
     this.setState({data: arr})
@@ -105,6 +104,7 @@ export default class HomePage extends Component {
                   seller={item.seller}
                   sellerUID={item.sellerUID}
                   username={item.username}
+                  postKey={item.key}
                   />)
               }
             </ScrollView>      
