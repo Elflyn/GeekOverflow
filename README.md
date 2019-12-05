@@ -10,4 +10,6 @@
 
 ## Note
 
-Run `yarn install` whenever you see something like `warn Package xxx has been ignored because it contains invalid configuration. Reason: Cannot find module 'xxx\package.json'`.
+Run `yarn install` whenever you see something like `warn Package xxx has been ignored because it contains invalid configuration. Reason: Cannot find module 'xxx/package.json'`.
+
+To build the release version, `cd android && gradlew assembleRelease`. The output apk is located at `./android/app/build/outputs/apk/release`
