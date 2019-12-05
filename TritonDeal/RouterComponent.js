@@ -8,6 +8,7 @@ import HomePage from './src/views/HomePage'
 import ItemDetail from './src/views/ItemDetail'
 import Placeholder from './src/views/Placeholder'
 import ChatList from './src/views/ChatList'
+import ShoppingCart from './src/views/ShoppingCart'
 import Chat from './src/components/Chat'
 import Post from './src/views/Post'
 import Profile from './src/views/Profile';
@@ -211,6 +212,14 @@ export default class RouterComponent extends React.Component {
             component={ItemDetail}
             navigationBarStyle={style.nav}
             title="Detail"
+            titleStyle={style.title}
+            renderLeftButton={() => renderBackButton()}
+          />
+          <Scene
+            key="cart"
+            component={ShoppingCart}
+            navigationBarStyle={style.nav}
+            title="Shopping Cart"
             titleStyle={style.title}
             renderLeftButton={() => renderBackButton()}
           />
