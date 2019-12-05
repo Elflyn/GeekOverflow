@@ -5,14 +5,17 @@ import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/storage';
-import { View, ToastAndroid, StyleSheet, ScrollView, Dimensions, StatusBar } from 'react-native';
-import { ListItem, Avatar } from 'react-native-elements';
+import { View, TouchableOpacity, StyleSheet, Text, ActivityIndicator, ToastAndroid, Button } from 'react-native';
+import { ListItem, Icon, Overlay } from 'react-native-elements';
+import ImagePicker from 'react-native-image-crop-picker';
+import RBSheet from "react-native-raw-bottom-sheet";
 
 export default class Chat extends React.Component {
 
   state = {
     messages: [],
-    avatarURI: null
+    avatarURI: null,
+    finished: true
   }
 
   componentDidMount = async () => {
@@ -27,6 +30,10 @@ export default class Chat extends React.Component {
   componentWillUnmount() {
     this.refOff();
   }
+
+  toggleActivityIndicator = () => {
+    this.setState({ finished: !this.state.finished });
+  };
   
   updateAvatarURI = async () => {
     const ref = firebase.storage().ref('avatar').child(firebase.auth().currentUser.uid);
@@ -48,7 +55,7 @@ export default class Chat extends React.Component {
   }
 
   parse = (snapshot) => {
-    const { createdAt, text, user, system } = snapshot.val();
+    const { createdAt, text, user, system, image } = snapshot.val();
     const { key: id } = snapshot;
     const { key: _id } = snapshot;
 
@@ -58,7 +65,8 @@ export default class Chat extends React.Component {
       createdAt,
       text,
       user,
-      system
+      system,
+      image
     };
     return message;
   };
@@ -96,6 +104,61 @@ export default class Chat extends React.Component {
     return firebase.database.ServerValue.TIMESTAMP;
   }
 
+  handleSelectPic = () => {
+    ImagePicker.openPicker({
+      compressImageMaxHeight: 1080,
+    }).then(image => {
+      this.RBSheet.close();
+      this.toggleActivityIndicator();
+      fetch(image.path).then((response) => {
+        response.blob().then((blob) => {
+          const filename = image.path.split('/').pop();
+          const ref = firebase.storage().ref('chat_img').child(filename);
+          ref.put(blob).then(async () => {
+            const url = await ref.getDownloadURL();
+            await this.sendImage(url);
+            this.toggleActivityIndicator();
+            ToastAndroid.show('Upload sucessful', ToastAndroid.SHORT);
+          })
+        })
+      })
+    });
+  };
+
+  handleNewPhoto = () => {
+    ImagePicker.openCamera({
+      compressImageMaxHeight: 1080,
+    }).then(image => {
+      this.RBSheet.close();
+      this.toggleActivityIndicator();
+      fetch(image.path).then((response) => {
+        response.blob().then((blob) => {
+          const ref = firebase.storage().ref('chat_img');
+          ref.put(blob).then(async () => {
+            const url = await ref.getDownloadURL();
+            await this.sendImage(url);
+            this.toggleActivityIndicator();
+            ToastAndroid.show('Upload sucessful', ToastAndroid.SHORT);
+          })
+        })
+      })
+    });
+  }
+
+  sendImage = async (url) => {
+    const cl = Actions.refs.chatList;
+    cl.updateList();
+    const message = {
+      text: '',
+      image: url,
+      user: this.user,
+      createdAt: this.timestamp,
+    };
+    this.ref.push(message);
+    const rootRef = firebase.database().ref('chat_by_id/' + this.props.chatID);
+    await rootRef.update({ lastText: '[Image]', lastTime: this.timestamp, lastRead: false, lastBy: firebase.auth().currentUser.uid })
+  }
+
   render() {
     return (
       <View style={{ flex: 1 }}>
@@ -109,12 +172,55 @@ export default class Chat extends React.Component {
           onSend={this.send}
           user={this.user}
           showUserAvatar
-          multiline={false}
+          maxComposerHeight={40}
+          textInputProps={{style: {fontSize: 17, width: 295, marginLeft: 5}}}
+          renderActions={() => {
+            return (
+              <TouchableOpacity
+                onPress={() => this.RBSheet.open()}
+              >
+                <Icon size={35} iconStyle={style.iconStyle} name="image" type="evilicon" />
+              </TouchableOpacity>
+            )
+          }}
         />
+        <RBSheet
+          ref={ref => this.RBSheet = ref}
+          height={150}
+          duration={250}
+        >
+          <View>
+            <TouchableOpacity style={style.menuButton} onPress={this.handleSelectPic}><Text style={style.menuButtonText}>Upload</Text></TouchableOpacity>
+            <TouchableOpacity style={style.menuButton} onPress={this.handleNewPhoto}><Text style={style.menuButtonText}>New Photo</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => this.RBSheet.close()} style={style.menuButton}><Text style={style.menuButtonText}>Cancel</Text></TouchableOpacity>
+          </View>
+        </RBSheet>
+        <Overlay
+          isVisible={!this.state.finished}
+          width="auto"
+          height="auto"
+        >
+          <ActivityIndicator size='large' color='#eabb33' />
+        </Overlay>
       </View>
     );
   }
 }
 ;
-const styles = StyleSheet.create({
+const style = StyleSheet.create({
+  iconStyle: {
+    color: '#004862',
+    paddingBottom: 10,
+    paddingLeft: 10
+  },
+  menuButton: {
+    width: "100%",
+    borderBottomColor: 'black',
+    paddingVertical: 10,
+  },
+
+  menuButtonText: {
+    textAlign: 'center',
+    fontSize: 20,
+  },
 });
