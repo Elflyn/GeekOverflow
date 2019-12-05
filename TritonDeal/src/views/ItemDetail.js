@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Icon, Button} from 'react-native-elements';
-import {StyleSheet, View, Image, Text, ScrollView} from 'react-native';
+import {StyleSheet, View, Image, Text, ScrollView, Alert} from 'react-native';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/database';
@@ -9,7 +9,9 @@ import ChatList from './ChatList';
 
 export default class ItemDetail extends Component {
 
-  state = {chatID: null};
+  state = {
+    chatID: null
+  };
 
   componentWillMount = async () => {
     const chatListRef = firebase.database().ref('user_to_chat/' + firebase.auth().currentUser.uid);
@@ -25,24 +27,25 @@ export default class ItemDetail extends Component {
   }
 
   render() {
+    const {itemName, imageSource, tags, description, price, seller, sellerUID, username, postKey} = this.props
     return (
       <View>
         <View>
           <View style={style.detailTitleRow}>
-            <Text style={style.detailTitle}>{this.props.itemName}</Text>
+            <Text style={style.detailTitle}>{itemName}</Text>
             <View style={style.detailTopIcon}>
           </View>
           </View>
           <ScrollView horizontal={true} style={style.imageScroll}>
-            {this.props.imageSource.map(image =><Image source={{uri:image}} style={style.multiImage}/>)}
+            {imageSource.map(image =><Image source={{uri:image}} style={style.multiImage}/>)}
           </ScrollView>
           <View style={{flexDirection:"row"}}>
-            <Text style={{fontSize:30,marginTop:5}}>${this.props.price}</Text>
+            <Text style={{fontSize:30,marginTop:5}}>${price}</Text>
           </View>
           <ScrollView style={{height:160,marginTop:10}}>
             <View style={style.detailTagsView}>
               {
-                this.props.tags.map((tag,i)=>{
+                tags.map((tag,i)=>{
                   return(
                     <View style={style.detailTag} key={i}>
                     <Text style={style.detailTagText}>{tag}</Text>
@@ -51,32 +54,53 @@ export default class ItemDetail extends Component {
                 })
               }
             </View>
-            <Text style={{fontSize:18,padding:5}}>{this.props.description}</Text>
+            <Text style={{fontSize:18,padding:5}}>{description}</Text>
           </ScrollView>
-          <ActionButtons props={this.props} cid={this.state.chatID}/>
+          <ActionButtons 
+            sellerUID={sellerUID}          
+            cid={this.state.chatID} 
+            imageSource={imageSource[0]}
+            itemName={itemName}
+            price={price}
+            postKey={postKey}
+          />
         </View>
       </View>
     )
   }
 }
 
-const ActionButtons = (props) => {
-  return (props.props.sellerUID != firebase.auth().currentUser.uid) ?
+const ActionButtons = ({cid, sellerUID, price, itemName, imageSource, postKey}) => {
+  return (sellerUID != firebase.auth().currentUser.uid) ?
     <View style={{ flexDirection: "row", justifyContent: 'center' }}>
       <Button title="Contact Seller" buttonStyle={{ margin: 10 }} onPress={() => {
         var chatID;
-        if (!props.cid) {
+        if (!cid) {
           const cl = new ChatList();
-          chatID = cl.createChat(firebase.auth().currentUser.uid, props.props.sellerUID, props.props.imageSource[0], props.props.itemName, props.props.price);
+          chatID = cl.createChat(firebase.auth().currentUser.uid, sellerUID, imageSource[0], itemName, price);
         } else {
-          chatID = props.cid;
+          chatID = cid;
         }
         Actions._chatList();
-        Actions.chat({ title: props.props.username, chatID: chatID, imgURI: props.props.imageSource[0], itemName: props.props.itemName, price: props.props.price })
+        Actions.chat({ title: username, chatID: chatID, imgURI: imageSource[0], itemName: itemName, price: price })
       }} />
-      <Button title="Add to Cart" buttonStyle={{ margin: 10 }} />
+      <Button 
+        onPress={ () => {
+         const userCartRef = firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid)
+         userCartRef.orderByChild('post').equalTo(postKey).once('value', snapshot => {
+           if (snapshot.exists()) {
+            Alert.alert('','You have added this item to you chart', [{text: 'OK', onDismiss: () => {}}])
+           } else {
+            userCartRef.push({post: postKey})
+           }
+         })
+        }}
+        title="Add to Cart"
+        buttonStyle={{ margin: 10 }} 
+       />
     </View>
-    : <View style={{ flexDirection: "row", justifyContent: 'center' }}>
+    : 
+    <View style={{ flexDirection: "row", justifyContent: 'center' }}>
       <Button title="Cancel this listing" buttonStyle={{ margin: 10 }} />
     </View>
 }

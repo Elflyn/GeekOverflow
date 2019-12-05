@@ -7,6 +7,7 @@ import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/storage';
+import {Actions} from 'react-native-router-flux'
 
 //TODO:if need to control item title in 30 characters
 const SEARCH_RESULT=[{name:"Car", source :["http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg","https://upload.wikimedia.org/wikipedia/commons/3/3c/Infiniti_Q60_2.0t_P4250831.jpg"],
@@ -42,8 +43,7 @@ export default class HomePage extends Component {
           const photo = await firebase.storage().ref('postImage').child(`${key}-${i}`).getDownloadURL();
           p.push(photo);
         }
-        // this.setState({data: [...this.state.data, {title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller:avatar}]})
-        arr.push({title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller: avatar, sellerUID: post.user, username: post.username})
+        arr.push({title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller: avatar, sellerUID: post.user, username: post.username, key: key})
       }
     })
     this.setState({data: arr})
@@ -88,7 +88,7 @@ export default class HomePage extends Component {
                   this.setState({ searchRes: true });
                   this.setState({ searchSuggest: false })
                 }} />
-              <Icon type="entypo" name="shopping-cart" color="#006A96" containerStyle={style.backIcon} size={30}/>
+              <Icon type="entypo" name="shopping-cart" color="#006A96" containerStyle={style.backIcon} size={30} onPress={() => Actions.cart()}/>
             </View>
             <ScrollView
               refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />}
@@ -105,6 +105,7 @@ export default class HomePage extends Component {
                   seller={item.seller}
                   sellerUID={item.sellerUID}
                   username={item.username}
+                  postKey={item.key}
                   />)
               }
             </ScrollView>      
