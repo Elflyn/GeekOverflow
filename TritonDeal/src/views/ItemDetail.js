@@ -9,15 +9,19 @@ import ChatList from './ChatList';
 
 export default class ItemDetail extends Component {
 
+  state = {chatID: null};
+
   componentWillMount = async () => {
     const chatListRef = firebase.database().ref('user_to_chat/' + firebase.auth().currentUser.uid);
-    await chatListRef.orderByKey().equalTo(this.props.sellerUID).once('value').then((snapshot) => {
+    var cid;
+    await chatListRef.orderByChild('anotherUID').equalTo(this.props.sellerUID).once('value').then((snapshot) => {
       snapshot.forEach(childSnapshot => {
-        this.chatID = '123';
+        cid = childSnapshot.val().chatID;
       })
     }).catch(error => {
       console.log(error.message);
     })
+    this.setState({chatID: cid})
   }
 
   render() {
@@ -49,26 +53,26 @@ export default class ItemDetail extends Component {
             </View>
             <Text style={{fontSize:18,padding:5}}>{this.props.description}</Text>
           </ScrollView>
-          <ActionButtons passProps={this.props} cid={this.chatID}/>
+          <ActionButtons props={this.props} cid={this.state.chatID}/>
         </View>
       </View>
     )
   }
 }
 
-const ActionButtons = (passProps) => {
-  return (passProps.passProps.sellerUID != firebase.auth().currentUser.uid) ?
+const ActionButtons = (props) => {
+  return (props.props.sellerUID != firebase.auth().currentUser.uid) ?
     <View style={{ flexDirection: "row", justifyContent: 'center' }}>
       <Button title="Contact Seller" buttonStyle={{ margin: 10 }} onPress={() => {
         var chatID;
-        if (!passProps.cid) {
+        if (!props.cid) {
           const cl = new ChatList();
-          chatID = cl.createChat(firebase.auth().currentUser.uid, passProps.passProps.sellerUID, passProps.passProps.imageSource[0], passProps.passProps.itemName, passProps.passProps.price);
+          chatID = cl.createChat(firebase.auth().currentUser.uid, props.props.sellerUID, props.props.imageSource[0], props.props.itemName, props.props.price);
         } else {
-          chatID = passProps.cid;
+          chatID = props.cid;
         }
         Actions._chatList();
-        Actions.chat({ title: passProps.passProps.username, chatID: chatID, imgURI: passProps.passProps.imageSource[0], itemName: passProps.passProps.itemName, price: passProps.passProps.price })
+        Actions.chat({ title: props.props.username, chatID: chatID, imgURI: props.props.imageSource[0], itemName: props.props.itemName, price: props.props.price })
       }} />
       <Button title="Add to Cart" buttonStyle={{ margin: 10 }} />
     </View>

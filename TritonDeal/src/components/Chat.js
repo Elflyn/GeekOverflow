@@ -40,7 +40,7 @@ export default class Chat extends React.Component {
   }
 
   refOn = (callback) => {
-    this.ref.limitToLast(20).on('child_added', snapshot => callback(this.parse(snapshot)));
+    this.ref.on('child_added', snapshot => callback(this.parse(snapshot)));
   }
 
   refOff = () => {

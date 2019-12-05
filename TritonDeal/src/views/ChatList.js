@@ -68,7 +68,8 @@ export default class ChatList extends React.Component {
       chatID: chatID,
       imgURI: imgURI,
       itemName: itemName,
-      price: price
+      price: price,
+      read: false
     }
     return chatListItem;
   };
@@ -185,11 +186,11 @@ export default class ChatList extends React.Component {
     const chatListRef = firebase.database().ref('user_to_chat');
     chatListRef.child(currUID).push({
       chatID: chatRef.key,
-      //anotherUID: anotherUID
+      anotherUID: anotherUID
     });
     chatListRef.child(anotherUID).push({
       chatID: chatRef.key,
-      //anotherUID: currUID
+      anotherUID: currUID
     });
     return chatRef.key;
   }
@@ -262,12 +263,6 @@ export default class ChatList extends React.Component {
       </View>
     )
   }
-}
-
-const TimeDisplay = ({ time }) => {
-  return (
-    <Text style={{ color: 'grey' }}>{getTimeString(time)}</Text>
-  )
 }
 
 const getTimeString = (timestamp) => {
