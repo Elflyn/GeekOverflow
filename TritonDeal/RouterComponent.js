@@ -159,7 +159,7 @@ export default class RouterComponent extends React.Component {
                   navigationBarStyle={style.nav}
                   title="Chat"
                   titleStyle={style.title}
-                  renderRightButton={() => renderAddButton()}
+                  //renderRightButton={() => renderAddButton()}
                 />
                 <Scene
                   key="chat"

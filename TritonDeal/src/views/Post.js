@@ -94,6 +94,7 @@ class Post extends Component {
         "active": true,
         "photos": photos.length,
         "price": price,
+        "username": user.displayName,
       }).then(snap => 
         { const key = snap.key;
           photos.forEach((photo, i) => {
@@ -139,14 +140,11 @@ class Post extends Component {
 
   selectImage = () => {
     ImagePicker.openPicker({
-      width: 512,
-      height: 280,
-      cropping: true,
+      compressImageMaxHeight: 1080,
     }).then(image => {
       this.setState({photos: [...this.state.photos, image.path]})
     });
   }
-
 
   formatDate = (date) => {
     const day = date.getDate();
@@ -157,13 +155,13 @@ class Post extends Component {
   
   render() {
     const { showDatePicker, date, condition, dateValue, tags, showInputBox, title, photos} = this.state;
-    const conditions = ['Brand New', 'Like New', 'Open Box', 'Used', 'Manufacturer Refurbished', 'acceptable', 'For parts or not working'];
+    const conditions = ['Brand New', 'Like New', 'Used', 'Acceptable'];
     return (
       <ScrollView>
         <View style={style.upperContainer}>
           <View style={style.section}>
             <Text style={style.title}>Item Title:</Text>
-            <Input placeholder="title" onChangeText={value => this.setState({title: value})} />
+            <Input placeholder="Title" onChangeText={value => this.setState({title: value})} />
             <Text style={style.title}>Price:</Text>
             <Input placeholder="Price" onChangeText={value => this.setState({price: value})} />
             <Divider style={style.divider}/>
@@ -207,7 +205,7 @@ class Post extends Component {
             rightElement={
             <Picker
               selectedValue={condition}
-              style={{height: 50, width: 100}}
+              style={{height: 50, width: '41%'}}
               onValueChange={(value) => this.setState({condition: value})}
             >
               {

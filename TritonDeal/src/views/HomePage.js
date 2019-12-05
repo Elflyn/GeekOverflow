@@ -43,7 +43,7 @@ export default class HomePage extends Component {
           p.push(photo);
         }
         // this.setState({data: [...this.state.data, {title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller:avatar}]})
-        arr.push({title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller:avatar})
+        arr.push({title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller: avatar, sellerUID: post.user, username: post.username})
       }
     })
     this.setState({data: arr})
@@ -94,6 +94,8 @@ export default class HomePage extends Component {
                     description={item.description}
                     price={item.price}
                     seller={item.seller}
+                    sellerUID={item.sellerUID}
+                    username={item.username}
                   />)
               }
             </ScrollView>      

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, Linking, TouchableOpacity, ScrollView, ToastAndroid } from 'react-native';
+import { StyleSheet, View, Text, Linking, TouchableOpacity, ScrollView, ToastAndroid, RefreshControl, Dimensions } from 'react-native';
 import { Overlay, Icon, Input } from 'react-native-elements';
 import { ListItem, Avatar } from 'react-native-elements';
 import { Actions } from 'react-native-router-flux';
@@ -11,14 +11,12 @@ import '@react-native-firebase/storage';
 
 export default class ChatList extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
+  state = {
       isVisible: false,
       dialogText: 'Enter email',
       email: null,
-      list: []
-    }
+      list: [],
+      isRefreshing: false
   }
 
   componentDidMount = () => {
@@ -48,6 +46,9 @@ export default class ChatList extends React.Component {
         title = await this.getTitle(anotherUID);
         message = childSnapshot.val().lastText;
         lastTime = childSnapshot.val().lastTime;
+        imgURI = childSnapshot.val().img;
+        itemName = childSnapshot.val().itemName;
+        price = childSnapshot.val().price;
       });
     }).catch((error) => {
       var errorMessage = error.message;
@@ -59,7 +60,10 @@ export default class ChatList extends React.Component {
       message: message,
       avatar: avatarURI,
       lastTime: lastTime,
-      chatID: chatID
+      chatID: chatID,
+      imgURI: imgURI,
+      itemName: itemName,
+      price: price
     }
     return chatListItem;
   };
@@ -124,6 +128,9 @@ export default class ChatList extends React.Component {
       }
       event_count += 1;
     });
+    this.chatByIdRef.on('child_changed', async snapshot => {
+      this.updateList();
+    })
   }
 
   refOff = () => {
@@ -147,12 +154,12 @@ export default class ChatList extends React.Component {
       if (!anotherUID) {
         ToastAndroid.show('User not found!', ToastAndroid.SHORT);
       } else {
-        this.createChat(currUID, anotherUID)
+        this.createChat(currUID, anotherUID, null)
       }
     }
   }
 
-  createChat = (currUID, anotherUID) => {
+  createChat = (currUID, anotherUID, firstImgUrl, itemName, price) => {
     const chat = {
       user1: currUID,
       user2: anotherUID,
@@ -165,17 +172,27 @@ export default class ChatList extends React.Component {
       ],
       lastText: 'Chat started',
       lastTime: this.timestamp,
+      img: firstImgUrl,
+      itemName: itemName,
+      price: price
     }
     const chatRef = this.chatByIdRef.push(chat);
     const chatListRef = firebase.database().ref('user_to_chat');
     chatListRef.child(currUID).push({
       chatID: chatRef.key,
-      anotherUID: anotherUID,
+      anotherUID: anotherUID
     });
     chatListRef.child(anotherUID).push({
       chatID: chatRef.key,
-      anotherUID: anotherUID,
+      anotherUID: currUID
     });
+    return chatRef.key;
+  }
+
+  onRefresh = async () => {
+    this.setState({ isRefreshing: true });
+    await this.updateList();
+    this.setState({ isRefreshing: false });
   }
 
   get chatByIdRef() {
@@ -193,18 +210,24 @@ export default class ChatList extends React.Component {
   render() {
     return (
       <View>
-        <ScrollView>
+        <ScrollView refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={this.onRefresh} />
+        }
+          style={{ height: Dimensions.get('window').height }}
+        >
           {
             this.state.list.map((item, i) => (
               <ListItem
                 key={i}
-                leftAvatar={{ size: 'medium', source: { uri: item.avatar } }}
+                leftAvatar={{ size: 65, source: { uri: item.avatar } }}
                 title={item.name}
                 titleStyle={style.title}
-                subtitle={<Subtitle message={item.message} style={style.message} />}
-                rightElement={<TimeDisplay time={item.lastTime} />}
+                subtitle={<Subtitle message={item.message} timeString={getTimeString(item.lastTime)} />}
+                rightAvatar={{ size: 65, source: { uri: item.imgURI } }}
                 onPress={() => {
-                  Actions.chat({ title: item.name, chatID: item.chatID })
+                  Actions.chat({ title: item.name, chatID: item.chatID, imgURI: item.imgURI, itemName: item.itemName, price: item.price })
                 }}
               />))
           }
@@ -248,9 +271,10 @@ const getTimeString = (timestamp) => {
   return new Date(timestamp).toLocaleTimeString("en-US").slice(0, 5);
 }
 
-const Subtitle = ({ message }) => (
+const Subtitle = ({ message, timeString }) => (
   <View>
     <Text style={style.message} numberOfLines={2}>{message}</Text>
+    <Text style={style.time} numberOfLines={2}>{timeString}</Text>
   </View>
 )
 
@@ -260,7 +284,7 @@ const style = StyleSheet.create({
   },
 
   title: {
-    fontSize: 21,
+    fontSize: 20,
   },
 
   centerText: {
@@ -277,4 +301,8 @@ const style = StyleSheet.create({
     marginRight: 15,
     color: '#004862',
   },
+  time: {
+    fontSize: 12,
+    color: 'gray'
+  }
 })

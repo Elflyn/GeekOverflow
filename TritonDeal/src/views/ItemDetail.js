@@ -1,8 +1,25 @@
 import React, {Component} from 'react';
 import {Icon, Button} from 'react-native-elements';
 import {StyleSheet, View, Image, Text, ScrollView} from 'react-native';
+import firebase from '@react-native-firebase/app';
+import '@react-native-firebase/auth';
+import '@react-native-firebase/database';
+import { Actions } from 'react-native-router-flux';
+import ChatList from './ChatList';
 
 export default class ItemDetail extends Component {
+
+  componentWillMount = async () => {
+    const chatListRef = firebase.database().ref('user_to_chat/' + firebase.auth().currentUser.uid);
+    await chatListRef.orderByChild('anotherUID').equalTo(this.props.sellerUID).once('value').then((snapshot) => {
+      snapshot.forEach(childSnapshot => {
+        this._chatID = childSnapshot.val().chatID;
+      })
+    }).catch(error => {
+      console.log(error.message);
+    })
+  }
+
   render() {
     return (
       <View>
@@ -33,7 +50,17 @@ export default class ItemDetail extends Component {
             <Text style={{fontSize:18,padding:5}}>{this.props.description}</Text>
           </ScrollView>
           <View style={{flexDirection:"row", justifyContent: 'center'}}>
-            <Button title="Contact Seller" buttonStyle={{margin:10}}/>
+            <Button title="Contact Seller" buttonStyle={{margin:10}} onPress={() => {
+              var chatID;
+              if (!this._chatID) {
+                const cl = new ChatList;
+                chatID = cl.createChat(firebase.auth().currentUser.uid, this.props.sellerUID, this.props.imageSource[0], this.props.itemName, this.props.price);
+              } else {
+                chatID = this._chatID;
+              }
+              Actions._chatList();
+              Actions.chat({ title: this.props.username, chatID: chatID, imgURI: this.props.imageSource[0], itemName: this.props.itemName, price: this.props.price })
+            }}/>
             <Button title="Add to Chart" buttonStyle={{margin:10}}/>
           </View>
         </View>

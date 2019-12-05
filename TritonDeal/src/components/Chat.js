@@ -6,6 +6,7 @@ import '@react-native-firebase/database';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/storage';
 import { View, ToastAndroid, StyleSheet, ScrollView, Dimensions, StatusBar } from 'react-native';
+import { ListItem, Avatar } from 'react-native-elements';
 
 export default class Chat extends React.Component {
 
@@ -97,13 +98,20 @@ export default class Chat extends React.Component {
 
   render() {
     return (
-      <GiftedChat
-        messages={this.state.messages}
-        onSend={this.send}
-        user={this.user}
-        showUserAvatar
-        multiline={false}
-      />
+      <View style={{ flex: 1 }}>
+        <ListItem 
+          title={this.props.itemName} 
+          leftAvatar={{ source: { uri: this.props.imgURI } }}
+          rightElement 
+          subtitle={'$ ' + this.props.price}/>
+        <GiftedChat
+          messages={this.state.messages}
+          onSend={this.send}
+          user={this.user}
+          showUserAvatar
+          multiline={false}
+        />
+      </View>
     );
   }
 }
