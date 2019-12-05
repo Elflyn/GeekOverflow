@@ -13,7 +13,9 @@ import Post from './src/views/Post'
 import Profile from './src/views/Profile';
 import { Icon } from 'react-native-elements';
 import EditProfile from './src/views/EditProfile';
-import { firebase } from '@react-native-firebase/auth';
+import firebase from '@react-native-firebase/app';
+import '@react-native-firebase/auth';
+import '@react-native-firebase/messaging';
 import message from './src/message';
 import StackViewStyleInterpolator from 'react-navigation-stack/src/views/StackView/StackViewStyleInterpolator';
 
@@ -37,11 +39,52 @@ export default class RouterComponent extends React.Component {
     }
     Linking.addEventListener("url", this.handeLaunchByUrl);
     BackHandler.addEventListener('hardwareBackPress', () => this.handleBackButton())
+    if (firebase.auth().currentUser) {
+      this.handleFCMRegister();
+    }
   }
 
   componentWillUnmount() {
     Linking.removeEventListener("url", this.handeLaunchByUrl);
     BackHandler.addEventListener('hardwareBackPress', () => this.handleBackButton())
+  }
+
+  handleFCMRegister = () => {
+    const messaging = firebase.messaging();
+    messaging.getToken().then((token) => {
+      if (token) {
+        this.sendTokenToDatabase(token);
+      } else {
+        ToastAndroid.show('No Instance ID token available.', ToastAndroid.SHORT);
+      }
+    }).catch((err) => {
+      ToastAndroid.show('An error occurred while retrieving token. ', ToastAndroid.SHORT);
+    });
+    messaging.onTokenRefresh(() => {
+      messaging.getToken().then((token) => {
+        if (token) {
+          this.sendTokenToDatabase(token);
+        } else {
+          ToastAndroid.show('No Instance ID token available.', ToastAndroid.SHORT);
+        }
+      }).catch((err) => {
+        ToastAndroid.show('An error occurred while retrieving token. ', ToastAndroid.SHORT);
+      });
+    });
+  }
+
+  sendTokenToDatabase = async (token) => {
+    const ref = firebase.database().ref('users');
+    var key;
+    await ref.orderByChild('uid').equalTo(firebase.auth().currentUser.uid).once('value').then((snapshot) => {
+      snapshot.forEach(childSnapshot => {
+        key = childSnapshot.key;
+      })
+    }).catch((error) => {
+      var errorMessage = error.message;
+      ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+    });
+    ref.child(key).update({ fcmToken: token });
   }
 
   handeLaunchByUrl = (event) => {
