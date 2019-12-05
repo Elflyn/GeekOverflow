@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Icon, Button} from 'react-native-elements';
-import {StyleSheet, View, Image, Text, ScrollView} from 'react-native';
+import {StyleSheet, View, Image, Text, ScrollView, Alert} from 'react-native';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/database';
@@ -86,9 +86,15 @@ const ActionButtons = ({cid, sellerUID, price, itemName, imageSource, postKey}) 
       }} />
       <Button 
         onPress={ () => {
-         const userCartRef = firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid);
-         userCartRef.push({post: postKey})} 
-        }
+         const userCartRef = firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid)
+         userCartRef.orderByChild('post').equalTo(postKey).once('value', snapshot => {
+           if (snapshot.exists()) {
+            Alert.alert('','You have added this item to you chart', [{text: 'OK', onDismiss: () => {}}])
+           } else {
+            userCartRef.push({post: postKey})
+           }
+         })
+        }}
         title="Add to Cart"
         buttonStyle={{ margin: 10 }} 
        />
