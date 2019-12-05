@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "376517016642-d7o4impkjd88vf5i1k6471jm90u27ed6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tritondeal",
+            "certificate_hash": "9003561ac6fcd7a6087ae4b2ccafb4f5c5242938"
+          }
+        },
+        {
           "client_id": "376517016642-s1sjd3g11j18hscdn2io44ve1185ln7h.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
