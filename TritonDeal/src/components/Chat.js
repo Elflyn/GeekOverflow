@@ -177,7 +177,9 @@ export default class Chat extends React.Component {
         <ListItem 
           title={this.props.itemName} 
           leftAvatar={{ source: { uri: this.props.imgURI } }}
-          rightElement 
+          rightElement={
+            <Button title='Button' />
+          }
           subtitle={'$ ' + this.props.price}/>
         <GiftedChat
           messages={this.state.messages}

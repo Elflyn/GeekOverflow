@@ -57,6 +57,7 @@ export default class ItemDetail extends Component {
             <Text style={{fontSize:18,padding:5}}>{description}</Text>
           </ScrollView>
           <ActionButtons 
+            username={username}
             sellerUID={sellerUID}          
             cid={this.state.chatID} 
             imageSource={imageSource[0]}
@@ -70,19 +71,19 @@ export default class ItemDetail extends Component {
   }
 }
 
-const ActionButtons = ({cid, sellerUID, price, itemName, imageSource, postKey}) => {
+const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, postKey}) => {
   return (sellerUID != firebase.auth().currentUser.uid) ?
     <View style={{ flexDirection: "row", justifyContent: 'center' }}>
       <Button title="Contact Seller" buttonStyle={{ margin: 10 }} onPress={() => {
         var chatID;
         if (!cid) {
           const cl = new ChatList();
-          chatID = cl.createChat(firebase.auth().currentUser.uid, sellerUID, imageSource[0], itemName, price);
+          chatID = cl.createChat(firebase.auth().currentUser.uid, sellerUID, imageSource, itemName, price);
         } else {
           chatID = cid;
         }
         Actions._chatList();
-        Actions.chat({ title: username, chatID: chatID, imgURI: imageSource[0], itemName: itemName, price: price })
+        Actions.chat({ title: username, chatID: chatID, imgURI: imageSource, itemName: itemName, price: price })
       }} />
       <Button 
         onPress={ () => {
