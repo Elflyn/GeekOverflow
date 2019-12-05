@@ -11,16 +11,21 @@ import '@react-native-firebase/storage';
 
 export default class ChatList extends React.Component {
 
-  state = {
+  constructor(props) {
+    super(props);
+    this.state = {
       isVisible: false,
       dialogText: 'Enter email',
       email: null,
       list: [],
       isRefreshing: false
-  }
+    }
+  }  
 
   componentDidMount = () => {
-    this.setState({ list: this.props.initList })
+    if (this.props.initList) {
+      this.setState({ list: this.props.initList })
+    }
     this.refOn((chatListItem) => {
       var newList = [...this.state.list, chatListItem];
       newList.sort((a, b) => { return b.lastTime - a.lastTime })
@@ -120,7 +125,7 @@ export default class ChatList extends React.Component {
   }
 
   refOn = async (callback) => {
-    var list_num = this.props.initList.length;
+    var list_num = this.state.list.length;
     var event_count = 0
     this.chatListRef.on('child_added', async snapshot => {
       if (event_count >= list_num) {

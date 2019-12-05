@@ -13,7 +13,7 @@ export default class ItemDetail extends Component {
     const chatListRef = firebase.database().ref('user_to_chat/' + firebase.auth().currentUser.uid);
     await chatListRef.orderByKey().equalTo(this.props.sellerUID).once('value').then((snapshot) => {
       snapshot.forEach(childSnapshot => {
-        this._chatID = childSnapshot.val().key;
+        this.chatID = '123';
       })
     }).catch(error => {
       console.log(error.message);
@@ -49,7 +49,7 @@ export default class ItemDetail extends Component {
             </View>
             <Text style={{fontSize:18,padding:5}}>{this.props.description}</Text>
           </ScrollView>
-          <ActionButtons passProps={this.props}/>
+          <ActionButtons passProps={this.props} cid={this.chatID}/>
         </View>
       </View>
     )
@@ -57,18 +57,18 @@ export default class ItemDetail extends Component {
 }
 
 const ActionButtons = (passProps) => {
-  return (passProps.sellerUID === firebase.auth().currentUser.uid) ?
+  return (passProps.passProps.sellerUID != firebase.auth().currentUser.uid) ?
     <View style={{ flexDirection: "row", justifyContent: 'center' }}>
       <Button title="Contact Seller" buttonStyle={{ margin: 10 }} onPress={() => {
         var chatID;
-        if (!this._chatID) {
-          const cl = new ChatList;
-          chatID = cl.createChat(firebase.auth().currentUser.uid, passProps.sellerUID, passProps.imageSource[0], passProps.itemName, passProps.price);
+        if (!passProps.cid) {
+          const cl = new ChatList();
+          chatID = cl.createChat(firebase.auth().currentUser.uid, passProps.passProps.sellerUID, passProps.passProps.imageSource[0], passProps.passProps.itemName, passProps.passProps.price);
         } else {
-          chatID = this._chatID;
+          chatID = passProps.cid;
         }
         Actions._chatList();
-        Actions.chat({ title: passProps.username, chatID: chatID, imgURI: passProps.imageSource[0], itemName: passProps.itemName, price: passProps.price })
+        Actions.chat({ title: passProps.passProps.username, chatID: chatID, imgURI: passProps.passProps.imageSource[0], itemName: passProps.passProps.itemName, price: passProps.passProps.price })
       }} />
       <Button title="Add to Cart" buttonStyle={{ margin: 10 }} />
     </View>
