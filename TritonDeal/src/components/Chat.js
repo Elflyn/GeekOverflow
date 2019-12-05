@@ -47,7 +47,7 @@ export default class Chat extends React.Component {
   }
 
   refOn = (callback) => {
-    this.ref.on('child_added', snapshot => callback(this.parse(snapshot)));
+    this.ref.limitToLast(20).on('child_added', snapshot => callback(this.parse(snapshot)));
   }
 
   refOff = () => {
@@ -75,7 +75,7 @@ export default class Chat extends React.Component {
     return message;
   };
 
-  send = (messages) => {
+  send = async (messages) => {
     const cl = Actions.refs.chatList;
     cl.updateList();
     for (let i = 0; i < messages.length; i++) {
@@ -88,7 +88,15 @@ export default class Chat extends React.Component {
       this.ref.push(message);
     }
     const rootRef = firebase.database().ref('chat_by_id/' + this.props.chatID);
-    rootRef.update({ lastText: messages[messages.length - 1].text, lastTime: this.timestamp, lastRead: false, lastBy: firebase.auth().currentUser.uid })
+    const users = await firebase.database().ref('chat_by_id').child(this.props.chatID).once('value').then(snapshot => {
+      return {user1: snapshot.val().user1, user2: snapshot.val().user2}
+    })
+    const anotherUID = firebase.auth().currentUser.uid === users.user1 ? users.user2 : users.user1;
+    rootRef.update({ lastText: messages[messages.length - 1].text, lastTime: this.timestamp, lastRead: false, lastBy: firebase.auth().currentUser.uid });
+    var httpRequest = new XMLHttpRequest();
+    const requestURI = 'https://us-central1-tritondeal.cloudfunctions.net/sendPushNotification?title=' + firebase.auth().currentUser.displayName + "&msg=" + messages[messages.length - 1].text + "&uid=" + anotherUID
+    httpRequest.open('GET', requestURI, true);
+    httpRequest.send();
   };
 
   get ref() {
