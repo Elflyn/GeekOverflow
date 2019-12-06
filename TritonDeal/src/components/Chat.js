@@ -70,8 +70,9 @@ export default class Chat extends React.Component {
     };
 
     const rootRef = firebase.database().ref('chat_by_id/' + this.props.chatID);
-    rootRef.update({ lastRead: true })
-
+    if (message.user._id != firebase.auth().currentUser.uid) {
+      rootRef.update({ lastRead: true });
+    }
     return message;
   };
 
