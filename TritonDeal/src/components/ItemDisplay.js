@@ -19,7 +19,7 @@ export default class ItemDisplay extends Component{
         <Image source={{uri:this.props.imageSource[0]}}
             style={style.image}/>
         <View style={style.textView}>
-          <Text style={style.itemTitle}>{itemName.slice(0,TITLE_DISPLAY_OFFSET)}</Text>
+          <Text style={style.itemTitle}>{itemName}</Text>
           <View style={style.tagsView}>
             {
               tags.slice(0,TAG_DISPLAY_OFFSET).map((tag,i)=>{

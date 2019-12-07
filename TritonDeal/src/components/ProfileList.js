@@ -108,15 +108,6 @@ const choice = [
       color: '#F9B300',
       ...listStyle.iconStyle,
     },
-  },
-  {
-    title: 'My Purchase',
-    type: 'evilicon',
-    icon: 'credit-card',
-    style: {
-      ...listStyle.iconStyle,
-      color: 'black',
-    },
     last: true
   },
 ];
