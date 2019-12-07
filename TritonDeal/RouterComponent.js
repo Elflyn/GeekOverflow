@@ -152,12 +152,13 @@ export default class RouterComponent extends React.Component {
   }
 
   handleTabBarPress = ({ navigation, defaultHandler }) => {
-    if (navigation.state.routeName == '_message' || navigation.state.routeName == "_account") {
-      if (!firebase.auth().currentUser) {
+    if (!firebase.auth().currentUser) {
+      if (navigation.state.routeName == '_chatList' || navigation.state.routeName == "_account" || navigation.state.routeName == "_post") {
         Actions.login();
         return true;
       }
-    } else if (navigation.state.routeName == '_chatList') {
+    }
+    if (navigation.state.routeName == '_chatList') {
       Actions.jump('chatList', {initList: this.list});
       return true;
     }
