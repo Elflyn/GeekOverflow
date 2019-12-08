@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ToastAndroid} from 'react-native';
-import {Icon} from 'react-native-elements';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Icon } from 'react-native-elements';
 import { firebase } from '@react-native-firebase/auth';
+import { Actions } from 'react-native-router-flux'
 
 const listStyle = StyleSheet.create({
   background: {
@@ -51,7 +52,7 @@ const ProfileList = ({touchable, list}) => {
             {!touchable ? (
               <Text style={[listStyle.text, {color: item.verified ? 'black' : 'red'}]}>{item.title}</Text>
             ) : (
-              <TouchableOpacity style={listStyle.button}>
+              <TouchableOpacity style={listStyle.button} onPress={item.onPress} >
                 <Text style={listStyle.text}>{item.title}</Text>
                 <Icon
                   style={listStyle.buttonIcon}
@@ -95,6 +96,7 @@ const choice = [
     title: 'My Cart',
     type: 'evilicon',
     icon: 'cart',
+    onPress: () => Actions.cart(),
     style: {
       color: '#1C7AA0',
       ...listStyle.iconStyle,
