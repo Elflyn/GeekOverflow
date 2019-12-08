@@ -27,7 +27,7 @@ export default class InputBox extends React.Component {
                     <ListItem
                         title={this.state.title}
                         titleStyle={style.titleStyle}
-                        leftElement={<Button title="cancel" type="clear" onPress={this.props.cancel} />}
+                        leftElement={<Button title="Cancel" type="clear" onPress={this.props.cancel} />}
                         rightElement={<Button title="Save" type="solid" onPress={() => this.props.confirm(this.state.text)} />}
                     />
                     <Input
