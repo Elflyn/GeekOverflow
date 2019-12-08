@@ -14,7 +14,6 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import {Picker} from '@react-native-community/picker';
 import GradientButton from '../components/GradientButton';
 import InputBox from '../components/InputBox';
@@ -57,10 +56,7 @@ class Post extends Component {
     this.setState({
       isVisible: false,
       title: '',
-      date: '10-10-2020',
       condition: 'good',
-      showDatePicker: false,
-      dateValue: new Date(),
       tags: [],
       showInputBox: false,
       ipnutText: '',
@@ -76,15 +72,7 @@ class Post extends Component {
   handleNewPost = () => {
     const user = firebase.auth().currentUser;
     const postRef = firebase.database().ref('post');
-    const {
-      dateValue,
-      condition,
-      description,
-      title,
-      tags,
-      photos,
-      price,
-    } = this.state;
+    const {condition, description, title, tags, photos, price} = this.state;
     if (title === '') {
       this.setState({
         isVisible: true,
@@ -106,7 +94,6 @@ class Post extends Component {
     } else {
       this.setState({finished: false});
       const snap = postRef.push({
-        date: dateValue,
         condition: condition,
         description: description,
         title: title,
@@ -142,20 +129,6 @@ class Post extends Component {
     }
   };
 
-  setDate = (event, date) => {
-    date = date || this.state.date;
-    var s = this.formatDate(date);
-    this.setState({
-      showDatePicker: Platform.OS === 'ios' ? true : false,
-      date: s,
-      dateValue: date,
-    });
-  };
-
-  datePicker = () => {
-    this.setState({showDatePicker: true});
-  };
-
   toggleInputBox = () => {
     this.setState({showInputBox: !this.state.showInputBox});
   };
@@ -178,26 +151,24 @@ class Post extends Component {
     });
   };
 
-  formatDate = date => {
-    const day = date.getDate();
-    const month = date.getMonth();
-    const year = date.getFullYear();
-    return `${month}-${day}-${year}`;
-  };
-
   render() {
     const {
-      showDatePicker,
       date,
       condition,
-      dateValue,
       tags,
       showInputBox,
       title,
       photos,
       price,
     } = this.state;
-    const conditions = ['Brand New', 'Like New', 'Used', 'Acceptable'];
+    const conditions = [
+      'Brand New',
+      'Like New',
+      'Used',
+      'Acceptable',
+      'Refurbished',
+      'For parts or not working',
+    ];
     return (
       <ScrollView>
         <View style={style.upperContainer}>
@@ -281,23 +252,8 @@ class Post extends Component {
               </Picker>
             }
           />
-          <ListItem
-            title="Expiration Date"
-            rightTitle={date}
-            onPress={this.datePicker}
-          />
         </View>
         <View style={{marginBottom: 50}}>
-          {showDatePicker && (
-            <DateTimePicker
-              value={dateValue}
-              mode={'date'}
-              is24Hour={true}
-              display="spinner"
-              onChange={this.setDate}
-              minimumDate={new Date()}
-            />
-          )}
           <GradientButton text="Post" onPress={this.handleNewPost} />
         </View>
 
