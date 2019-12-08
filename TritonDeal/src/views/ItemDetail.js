@@ -18,7 +18,7 @@ export default class ItemDetail extends Component {
     var cid;
     await chatListRef.orderByChild('postID').equalTo(this.props.postKey).once('value').then((snapshot) => {
       snapshot.forEach(childSnapshot => {
-        if (firebase.auth().currentUser.uid == childSnapshot.val().user1) {
+        if (firebase.auth().currentUser && firebase.auth().currentUser.uid == childSnapshot.val().user1) {
           cid = childSnapshot.key;
         }
       })
@@ -75,8 +75,8 @@ export default class ItemDetail extends Component {
   }
 }
 
-const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, postKey, inCart, active}) => {
-  if (sellerUID != firebase.auth().currentUser.uid) {
+const ActionButtons = ({ username, cid, sellerUID, price, itemName, imageSource, postKey, inCart, active }) => {
+  if (firebase.auth().currentUser && sellerUID != firebase.auth().currentUser.uid) {
     return (
       <View style={{ flexDirection: "row", justifyContent: 'center' }}>
         {active &&
@@ -119,97 +119,33 @@ const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, 
         }
       </View>
     )
-  } else if (active) {
-    <View style={{ flexDirection: "row", justifyContent: 'center' }}>
-      <Button title="Cancel this listing" buttonStyle={{ margin: 10 }} onPress={() => {
-        Alert.alert(
-          null,
-          'This item cannot be viewed by other users once you cancel this listing.',
-          [
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-            {
-              text: 'OK', onPress: async () => {
-                const postRef = firebase.database().ref('post');
-                postRef.child(postKey).update({ active: false });
-                await props.cb();
-              }
-            },
-          ],
-        );
-      }} />
-    </View>
+  } else if (firebase.auth().currentUser && active) {
+    return (
+      <View style={{ flexDirection: "row", justifyContent: 'center' }}>
+        <Button title="Cancel this listing" buttonStyle={{ margin: 10 }} onPress={() => {
+          Alert.alert(
+            null,
+            'This item cannot be viewed by other users once you cancel this listing.',
+            [
+              {
+                text: 'Cancel',
+                style: 'cancel',
+              },
+              {
+                text: 'OK', onPress: async () => {
+                  const postRef = firebase.database().ref('post');
+                  postRef.child(postKey).update({ active: false });
+                  await props.cb();
+                }
+              },
+            ],
+          );
+        }} />
+      </View>
+    )
   } else {
     return null;
   }
-
-
-
-
-  return (sellerUID != firebase.auth().currentUser.uid) ?
-    <View style={{ flexDirection: "row", justifyContent: 'center' }}>
-      <Button title="Contact Seller" buttonStyle={{ margin: 10 }} onPress={() => {
-        var chatID;
-        if (!cid) {
-          const cl = new ChatList();
-          chatID = cl.createChat(firebase.auth().currentUser.uid, sellerUID, imageSource, itemName, price, postKey);
-        } else {
-          chatID = cid;
-        }
-        Actions._chatList();
-        Actions.chat({ title: username, chatID: chatID, imgURI: imageSource, itemName: itemName, price: price, sellerUID: sellerUID, postID: postKey, active: true })
-      }} />
-      { inCart ? 
-        <Button 
-          onPress={ () => {
-            firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid).child(postKey).remove()
-            Actions.cart();
-          }}
-          title="Remove from the Cart"
-          buttonStyle={{ margin: 10 }} 
-        />     
-        : <Button 
-          onPress={ () => {
-            const userCartRef = firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid)
-            userCartRef.orderByChild('post').equalTo(postKey).once('value', snapshot => {
-            if (snapshot.exists()) {
-              Alert.alert('','This item is already in your cart! Check out your shopping Cart!', [{text: 'OK', onDismiss: () => {}}])
-            } else {
-              userCartRef.push({post: postKey})
-              Alert.alert('','You have successfully added this item to you chart!', [{text: 'OK', onDismiss: () => {}}])
-            }
-          })
-          }}
-          title="Add to Cart"
-          buttonStyle={{ margin: 10 }} 
-        />
-
-      }
-    </View>
-    : 
-    <View style={{ flexDirection: "row", justifyContent: 'center' }}>
-      <Button title="Cancel this listing" buttonStyle={{ margin: 10 }} onPress={() => {
-        Alert.alert(
-          null,
-          'This item cannot be viewed by other users once you cancel this listing.',
-          [
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-            {
-              text: 'OK', onPress: async () => {
-                const postRef = firebase.database().ref('post');
-                postRef.child(postKey).update({ active: false });
-                await props.cb();
-              }
-            },
-          ],
-        );
-      }}/>
-    </View>
 }
 
 const style = StyleSheet.create({
