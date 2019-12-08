@@ -84,7 +84,7 @@ export default class ItemDetail extends Component {
           <ScrollView style={{height: 160, marginTop: 10}}>
             <View style={style.detailTagsView}>
               {tags.map((tag, i) => {
-                return  (
+                return (
                   <View style={style.detailTag} key={i}>
                     <Text style={style.detailTagText}>{tag}</Text>
                   </View>
@@ -234,7 +234,9 @@ const ActionButtons = ({
                   onPress: async () => {
                     const postRef = firebase.database().ref('post');
                     postRef.child(postKey).update({active: false});
-                    Actions.pop();
+                    cb().then(() => {
+                      Actions.pop();
+                    });
                   },
                 },
               ],

@@ -53,6 +53,7 @@ export default class MyPost extends React.Component {
             .once('value')
             .then(async post => {
               const p = JSON.parse(JSON.stringify(post));
+
               const avatar = await firebase
                 .storage()
                 .ref('avatar')
@@ -79,7 +80,7 @@ export default class MyPost extends React.Component {
                   seller: avatar,
                   sellerUID: p.user,
                   username: p.username,
-                  key: key,
+                  key: d[key].post,
                 });
               } else {
                 inactive.push({
@@ -91,7 +92,7 @@ export default class MyPost extends React.Component {
                   seller: avatar,
                   sellerUID: p.user,
                   username: p.username,
-                  key: key,
+                  key: d[key].post,
                 });
               }
             });
@@ -133,7 +134,7 @@ export default class MyPost extends React.Component {
                       username={item.username}
                       inCart={true}
                       active={true}
-                      cb={this.getShoppingCart}
+                      cb={this.getMyPost}
                     />
                   ))}
                 </View>
@@ -154,7 +155,7 @@ export default class MyPost extends React.Component {
                       username={item.username}
                       inCart={true}
                       active={false}
-                      cb={this.getShoppingCart}
+                      cb={this.getMyPost}
                     />
                   ))}
                 </View>

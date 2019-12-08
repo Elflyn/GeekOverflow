@@ -275,7 +275,7 @@ export default class RouterComponent extends React.Component {
                 navigationBarStyle={style.nav}
                 title="My Post"
                 titleStyle={style.title}
-                renderLeftButton={() => ToHome()}
+                renderLeftButton={() => renderBackButton()}
           />
 
         </Stack>

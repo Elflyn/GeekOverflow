@@ -117,7 +117,6 @@ export default class ShoppingCart extends React.Component {
   };
 
   render() {
-    console.log(this.state);
     return (
       <ScrollView style={style.container}>
         {this.state.finished ? (
