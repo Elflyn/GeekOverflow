@@ -1,14 +1,21 @@
-import React, { Component } from 'react';
-import { Input, ListItem, Overlay, Divider, Avatar, Badge } from 'react-native-elements';
+import React, {Component} from 'react';
+import {
+  Input,
+  ListItem,
+  Overlay,
+  Divider,
+  Avatar,
+  Badge,
+} from 'react-native-elements';
 import {
   StyleSheet,
   View,
   Text,
   ActivityIndicator,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-community/picker';
+import {Picker} from '@react-native-community/picker';
 import GradientButton from '../components/GradientButton';
 import InputBox from '../components/InputBox';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -16,13 +23,11 @@ import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/storage';
-import Dialog from '../components/Dialog'
-import { Actions } from 'react-native-router-flux';
-import message from '../message'
-
+import Dialog from '../components/Dialog';
+import {Actions} from 'react-native-router-flux';
+import message from '../message';
 
 class Post extends Component {
-
   state = {
     title: '',
     date: '10-10-2020',
@@ -37,16 +42,15 @@ class Post extends Component {
     isVisible: false,
     dialogText: '',
     handleDialog: this.closeDialog,
-    photos: [],
     finished: true,
     price: 0,
-  }
+  };
 
   closeDialog = () => {
     this.setState({
       isVisible: false,
     });
-  }
+  };
 
   handleSentPostSuccess = () => {
     Actions.home();
@@ -62,143 +66,200 @@ class Post extends Component {
       ipnutText: '',
       description: '',
       photos: [],
-      isVisible: false,
       dialogText: '',
       handleDialog: this.closeDialog,
-      photos: [],
       finished: true,
-      price: 0
+      price: 0,
     });
-  }
+  };
 
   handleNewPost = () => {
-    const user = firebase.auth().currentUser
-    const postRef = firebase.database().ref('post')
-    const { dateValue, condition, description, title, tags, photos, price } = this.state
+    const user = firebase.auth().currentUser;
+    const postRef = firebase.database().ref('post');
+    const {
+      dateValue,
+      condition,
+      description,
+      title,
+      tags,
+      photos,
+      price,
+    } = this.state;
     if (title === '') {
-      this.setState({ isVisible: true, dialogText: message.POST_MISSING_TITLE, handleDialog: this.closeDialog })
+      this.setState({
+        isVisible: true,
+        dialogText: message.POST_MISSING_TITLE,
+        handleDialog: this.closeDialog,
+      });
     } else if (tags.length === 0) {
-      this.setState({ isVisible: true, dialogText: message.POST_MISSING_TAG, handleDialog: this.closeDialog })
+      this.setState({
+        isVisible: true,
+        dialogText: message.POST_MISSING_TAG,
+        handleDialog: this.closeDialog,
+      });
     } else if (photos.length === 0) {
-      this.setState({ isVisible: true, dialogText: message.POST_MISSING_PHOTO, handleDialog: this.closeDialog })
+      this.setState({
+        isVisible: true,
+        dialogText: message.POST_MISSING_PHOTO,
+        handleDialog: this.closeDialog,
+      });
     } else {
-      this.setState({ finished: false })
+      this.setState({finished: false});
       const snap = postRef.push({
-        "date": dateValue,
-        "condition": condition,
-        "description": description,
-        "title": title,
-        "tags": tags,
-        "user": user.uid,
-        "active": true,
-        "photos": photos.length,
-        "price": price,
-        "username": user.displayName,
+        date: dateValue,
+        condition: condition,
+        description: description,
+        title: title,
+        tags: tags,
+        user: user.uid,
+        active: true,
+        photos: photos.length,
+        price: price,
+        username: user.displayName,
       });
       const key = snap.key;
       photos.forEach((photo, i) => {
         fetch(photo).then(response => {
           response.blob().then(blob => {
-            const ref = firebase.storage().ref('postImage').child(`${key}-${i}`)
+            const ref = firebase
+              .storage()
+              .ref('postImage')
+              .child(`${key}-${i}`);
             ref.put(blob);
-          })
-        })
-      })
+          });
+        });
+      });
       const postListRef = firebase.database().ref('user_to_post/' + user.uid);
       postListRef.push({
-        post: key
-      })
-      this.setState({ isVisible: true, dialogText: message.POST_SUCCESS, handleDialog: this.handleSentPostSuccess, finished: true })
+        post: key,
+      });
+      this.setState({
+        isVisible: true,
+        dialogText: message.POST_SUCCESS,
+        handleDialog: this.handleSentPostSuccess,
+        finished: true,
+      });
     }
-  }
+  };
 
   setDate = (event, date) => {
     date = date || this.state.date;
-    var s = this.formatDate(date)
+    var s = this.formatDate(date);
     this.setState({
       showDatePicker: Platform.OS === 'ios' ? true : false,
       date: s,
-      dateValue: date
+      dateValue: date,
     });
-  }
+  };
 
   datePicker = () => {
-    this.setState({ showDatePicker: true })
-  }
+    this.setState({showDatePicker: true});
+  };
 
   toggleInputBox = () => {
-    this.setState({ showInputBox: !this.state.showInputBox })
-  }
+    this.setState({showInputBox: !this.state.showInputBox});
+  };
 
-  updateTags = (input) => {
-    this.setState({ tags: [...this.state.tags, input] })
-  }
+  updateTags = input => {
+    this.setState({tags: [...this.state.tags, input]});
+  };
 
-  removeTag = (index) => {
+  removeTag = index => {
     let temp = this.state.tags;
-    temp = temp.filter((_, i) => i !== index)
-    this.setState({ tags: temp })
-  }
+    temp = temp.filter((_, i) => i !== index);
+    this.setState({tags: temp});
+  };
 
   selectImage = () => {
     ImagePicker.openPicker({
       compressImageMaxHeight: 1080,
     }).then(image => {
-      this.setState({ photos: [...this.state.photos, image.path] })
+      this.setState({photos: [...this.state.photos, image.path]});
     });
-  }
+  };
 
-  formatDate = (date) => {
+  formatDate = date => {
     const day = date.getDate();
     const month = date.getMonth();
     const year = date.getFullYear();
-    return `${month}-${day}-${year}`
-  }
+    return `${month}-${day}-${year}`;
+  };
 
   render() {
-    const { showDatePicker, date, condition, dateValue, tags, showInputBox, title, photos, price } = this.state;
+    const {
+      showDatePicker,
+      date,
+      condition,
+      dateValue,
+      tags,
+      showInputBox,
+      title,
+      photos,
+      price,
+    } = this.state;
     const conditions = ['Brand New', 'Like New', 'Used', 'Acceptable'];
     return (
       <ScrollView>
         <View style={style.upperContainer}>
           <View style={style.section}>
             <Text style={style.title}>Item Title:</Text>
-            <Input value={title} placeholder="Title" onChangeText={value => this.setState({ title: value })} />
+            <Input
+              value={title}
+              placeholder="Title"
+              onChangeText={value => this.setState({title: value})}
+            />
             <Text style={style.title}>Price:</Text>
-            <Input  value={price} placeholder="Price" onChangeText={value => this.setState({ price: value })} keyboardType="numeric"/>
+            <Input
+              value={price}
+              keyboardType={'numeric'}
+              placeholder="Price"
+              onChangeText={value => this.setState({price: value})}
+            />
             <Divider style={style.divider} />
           </View>
           <View style={style.section}>
             <Text style={style.title}>Upload Photo:</Text>
             <View style={style.photos}>
-              {
-                photos.map(photo => <Avatar source={{ uri: photo }} size="large" />)
-              }
-              <Avatar containerStyle={style.padding} title="+" size="large" onPress={this.selectImage} />
+              {photos.map(photo => (
+                <Avatar source={{uri: photo}} size="large" />
+              ))}
+              <Avatar
+                containerStyle={style.padding}
+                title="+"
+                size="large"
+                onPress={this.selectImage}
+              />
             </View>
             <Divider style={style.divider} />
           </View>
           <View style={style.tagContainer}>
-            {
-              tags.map((tag, index) => <Badge
+            {tags.map((tag, index) => (
+              <Badge
                 onPress={() => this.removeTag(index)}
                 badgeStyle={style.badgeStyle}
                 containerStyle={style.badge}
                 value={tag}
                 status="primary"
-              />)
-            }
+              />
+            ))}
             <Avatar
               containerStyle={style.padding}
-              rounded title="+" size="small"
+              rounded
+              title="+"
+              size="small"
               onPress={this.toggleInputBox}
             />
-            <Text style={{ fontSize: 18, marginLeft: 5, paddingVertical: 5, }}>Add Tag</Text>
+            <Text style={{fontSize: 18, marginLeft: 5, paddingVertical: 5}}>
+              Add Tag
+            </Text>
           </View>
           <Divider style={style.divider} />
           <View style={style.section}>
             <Text style={style.title}>Description:</Text>
-            <Input placeholder="30 words limit" onChangeText={value => this.setState({ description: value })} ></Input>
+            <Input
+              placeholder="30 words limit"
+              onChangeText={value => this.setState({description: value})}
+            />
           </View>
         </View>
         <View>
@@ -207,23 +268,26 @@ class Post extends Component {
             rightElement={
               <Picker
                 selectedValue={condition}
-                style={{ height: 50, width: '41%' }}
-                onValueChange={(value) => this.setState({ condition: value })}
-              >
-                {
-                  conditions.map((condition, index) => <Picker.Item value={condition} label={condition} key={index} />)
-                }
-              </Picker>}
+                style={{height: 50, width: '41%'}}
+                onValueChange={value => this.setState({condition: value})}>
+                {conditions.map((condition, index) => (
+                  <Picker.Item
+                    value={condition}
+                    label={condition}
+                    key={index}
+                  />
+                ))}
+              </Picker>
+            }
           />
           <ListItem
             title="Expiration Date"
             rightTitle={date}
             onPress={this.datePicker}
           />
-
         </View>
         <View style={{marginBottom: 50}}>
-          {showDatePicker &&
+          {showDatePicker && (
             <DateTimePicker
               value={dateValue}
               mode={'date'}
@@ -232,26 +296,29 @@ class Post extends Component {
               onChange={this.setDate}
               minimumDate={new Date()}
             />
-          }
-          <GradientButton text='Post' onPress={this.handleNewPost} />
+          )}
+          <GradientButton text="Post" onPress={this.handleNewPost} />
         </View>
-        
+
         <InputBox
           cancel={this.toggleInputBox}
-          confirm={(input) => { this.updateTags(input); this.toggleInputBox() }}
+          confirm={input => {
+            this.updateTags(input);
+            this.toggleInputBox();
+          }}
           isVisible={showInputBox}
-          text='Add Tag'
+          text="Add Tag"
         />
-        <Dialog isVisible={this.state.isVisible} text={this.state.dialogText} onPress={this.state.handleDialog} />
-        <Overlay
-          isVisible={!this.state.finished}
-          width="auto"
-          height="auto"
-        >
-          <ActivityIndicator size='large' color='#eabb33' />
+        <Dialog
+          isVisible={this.state.isVisible}
+          text={this.state.dialogText}
+          onPress={this.state.handleDialog}
+        />
+        <Overlay isVisible={!this.state.finished} width="auto" height="auto">
+          <ActivityIndicator size="large" color="#eabb33" />
         </Overlay>
       </ScrollView>
-    )
+    );
   }
 }
 
@@ -285,7 +352,7 @@ const style = StyleSheet.create({
     fontSize: 16,
     marginBottom: 3,
     paddingLeft: 10,
-    color: '#222831'
+    color: '#222831',
   },
 
   padding: {
@@ -299,8 +366,7 @@ const style = StyleSheet.create({
 
   badgeStyle: {
     height: 25,
-  }
-
-})
+  },
+});
 
 export default Post;
