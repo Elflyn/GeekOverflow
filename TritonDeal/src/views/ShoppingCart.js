@@ -1,6 +1,5 @@
 import React from 'react';
 import { ScrollView, Text, StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements'
 import ItemDisplay from '../components/ItemDisplay'
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';

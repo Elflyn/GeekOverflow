@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, TouchableOpacity, ToastAndroid, StatusBar, ActivityIndicator} from 'react-native';
-import {Icon, Button, Avatar, Overlay} from 'react-native-elements';
-import {InfoList, ChoiceList} from '../components/ProfileList';
+import { StyleSheet, Text, View, TouchableOpacity, ToastAndroid, StatusBar, ActivityIndicator } from 'react-native';
+import { Icon, Button, Avatar, Overlay } from 'react-native-elements';
+import { InfoList, ChoiceList } from '../components/ProfileList';
 import GradientButton from '../components/GradientButton';
-import {Actions} from 'react-native-router-flux';
+import { Actions } from 'react-native-router-flux';
 import firebase from '@react-native-firebase/app';
 import message from '../message';
 import RBSheet from "react-native-raw-bottom-sheet";

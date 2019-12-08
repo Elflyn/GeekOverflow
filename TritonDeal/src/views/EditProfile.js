@@ -1,14 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Text, Linking, TouchableOpacity, ToastAndroid, Alert, ActivityIndicator } from 'react-native';
-import { Input, Icon, ListItem, Button, Overlay } from 'react-native-elements';
+import { StyleSheet, View, ToastAndroid,  ActivityIndicator } from 'react-native';
+import { Input, ListItem, Button, Overlay } from 'react-native-elements';
 import { firebase } from '@react-native-firebase/auth';
-import { Actions } from 'react-native-router-flux';
 import message from '../message';
 import ReauthDialog from '../components/ReauthDialog'
-//import GradientButton from './GradientButton';
-//import auth from '@react-native-firebase/auth';
-//import { firebase } from '@react-native-firebase/auth';
-//import { Actions } from 'react-native-router-flux';
+
 
 export default class EditProfile extends React.Component {
 
@@ -41,9 +37,6 @@ export default class EditProfile extends React.Component {
         break;
       case "Email":
         this.handleUpdateEmail();
-        break;
-      case "Phone":
-        this.handleupdatePhone();
         break;
       default:
         this.toggleActivityIndicator();
@@ -120,14 +113,6 @@ export default class EditProfile extends React.Component {
           chevron
           onPress={() => {
             this.setState({ isVisible: true, text: "Email" });
-          }}
-        />
-        <ListItem
-          title="Phone"
-          bottomDivider
-          chevron
-          onPress={() => {
-            this.setState({ isVisible: true, text: "Phone" });
           }}
         />
         <Overlay

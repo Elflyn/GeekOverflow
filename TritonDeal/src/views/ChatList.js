@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Text, Linking, TouchableOpacity, ScrollView, ToastAndroid, RefreshControl, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, ToastAndroid, RefreshControl, Dimensions } from 'react-native';
 import { Overlay, Icon, Input } from 'react-native-elements';
-import { ListItem, Avatar } from 'react-native-elements';
+import { ListItem } from 'react-native-elements';
 import { Actions } from 'react-native-router-flux';
 import GradientButton from "../components/GradientButton";
 import firebase from '@react-native-firebase/app';

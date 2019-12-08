@@ -1,22 +1,18 @@
 import React, { Component } from 'react';
-import {Input, Icon, Button, Overlay, Avatar} from 'react-native-elements';
-import { Linking, ActivityIndicator } from 'react-native';
+import { Icon } from 'react-native-elements';
 import {
   StyleSheet,
   View,
   Text,
   ImageBackground,
   TouchableOpacity,
-  ToastAndroid,
-  Alert,
   StatusBar,
   Dimensions
 } from 'react-native';
-import { Actions, ActionConst } from 'react-native-router-flux';
+import { Actions } from 'react-native-router-flux';
 import { HEADER } from '../images';
 import Login from '../components/Login';
 import { firebase } from '@react-native-firebase/dynamic-links';
-import GradientButton from '../components/GradientButton';
 import Dialog from '../components/Dialog';
 import message from '../message';
 

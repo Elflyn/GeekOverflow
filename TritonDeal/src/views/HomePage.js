@@ -1,19 +1,12 @@
-import React, {Component} from 'react';
-import {SearchBar,Overlay,Icon,ListItem, ThemeProvider} from 'react-native-elements'
-import {View,TouchableOpacity, ActivityIndicator, StyleSheet, RefreshControl, ScrollView, Dimensions} from 'react-native';
+import React, { Component } from 'react';
+import { SearchBar, Icon } from 'react-native-elements'
+import { View,TouchableOpacity, ActivityIndicator, StyleSheet, RefreshControl, ScrollView, Dimensions } from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
-import TopNavBar from '../components/TopNavBar'
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/storage';
-import {Actions} from 'react-native-router-flux'
-
-//TODO:if need to control item title in 30 characters
-const SEARCH_RESULT=[{name:"Car", source :["http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg","https://upload.wikimedia.org/wikipedia/commons/3/3c/Infiniti_Q60_2.0t_P4250831.jpg"],
-              tags:["car","used"], description:"This is a 2017 used Infinity Q60, the condition is very new.Aside from a redesign, the 2017 Q60 received many major upgrades like a lower and wider body, introduction of second generation Direct Adaptive Steering, Drive Mode Selector with custom settings profile, hydraulic electronic rack and pinion power steering system standard (2.0t), introduction of Dynamic Digital Suspension, retuned seven speed automatic transmission, Active Grille Shutter in V6 engine models, and for the first time, all new turbocharged engines. The Q60 Convertible was discontinued for the second generation.",price:10000,seller:"LL",timeleft:"4d 2h",currentBid:7000},
-              {name:"Car", source :["http://media.wired.com/photos/5d09594a62bcb0c9752779d9/master/w_2560%2Cc_limit/Transpo_G70_TA-518126.jpg"],
-              tags:["car","used","bla"], description:"This is a 2017 used Infinity Q60, the condition is very new",price:10000,seller:"LL",timeleft:"4d 2h",currentBid:7000}]
+import { Actions } from 'react-native-router-flux'
 
 export default class HomePage extends Component {
   state = {
