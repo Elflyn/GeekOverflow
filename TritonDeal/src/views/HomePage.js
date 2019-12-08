@@ -16,7 +16,7 @@ export default class HomePage extends Component {
     data: [],
     searchRes:[],
     finished: false,
-    };
+  };
     
   updateSearch = (value) => {
     this.setState({ search:value, searching: value !== ''});
@@ -113,7 +113,13 @@ export default class HomePage extends Component {
             onCancel={() => this.updateSearch('')}
           />
             <TouchableOpacity
-              onPress={() => Actions.cart()}>
+              onPress={() => {
+                  if (firebase.auth().currentUser) {
+                    Actions.cart()
+                  } else {
+                    Actions.login();
+                  }
+                }}>
               <Icon type="entypo" name="shopping-cart" color="#006A96" containerStyle={style.backIcon} size={30} />
             </TouchableOpacity>
         </View>
