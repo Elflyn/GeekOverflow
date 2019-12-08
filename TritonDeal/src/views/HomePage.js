@@ -56,7 +56,7 @@ export default class HomePage extends Component {
           const photo = await firebase.storage().ref('postImage').child(`${key}-${i}`).getDownloadURL();
           p.push(photo);
         }
-        arr.push({title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller: avatar, sellerUID: post.user, username: post.username, key: key})
+        arr.push({title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller: avatar, sellerUID: post.user, username: post.username, key: key, active: post.active})
       }
     })
     this.setState({data: arr})
@@ -131,7 +131,7 @@ export default class HomePage extends Component {
                 username={item.username}
                 postKey={item.key}
                 inCart={false}
-                active={true}
+                active={item.active}
                 />)
             }
           </ScrollView>      

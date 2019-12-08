@@ -243,10 +243,10 @@ export default class Chat extends React.Component {
 
 const ConfirmButton = (props) => {
   return (props.sellerUID == firebase.auth().currentUser.uid) ?
-    <Button title='Mark as sold'onPress={() => {
+    <Button title='Mark as sold' onPress={() => {
       Alert.alert(
         null,
-        'Thank you. Your email address has been verified.',
+        'Once marked as sold, this item cannot be viewed by other users.',
         [
           {
             text: 'Cancel',
