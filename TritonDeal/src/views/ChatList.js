@@ -118,25 +118,34 @@ export default class ChatList extends React.Component {
   }
 
   updateList = async () => {
-    const snapshot = await this.chatListRef.once('value');
-    const toWait = [];
-    snapshot.forEach(async childSnapshot => {
-      toWait.push(this.parse(childSnapshot));
-    })
-    const list = await Promise.all(toWait);
-    list.sort((a, b) => { return b.lastTime - a.lastTime })
-    this.setState({ list: list });
+    try {
+      const snapshot = await this.chatListRef.once('value');
+      const toWait = [];
+      snapshot.forEach(async childSnapshot => {
+        toWait.push(this.parse(childSnapshot));
+      })
+      const list = await Promise.all(toWait);
+      list.sort((a, b) => { return b.lastTime - a.lastTime })
+      this.setState({ list: list });
+    } catch (error) {
+      ToastAndroid.show(error.message);
+    }
   }
 
   getList = async () => {
-    const snapshot = await this.chatListRef.once('value');
-    const toWait = [];
-    snapshot.forEach(async childSnapshot => {
-      toWait.push(this.parse(childSnapshot));
-    })
-    const list = await Promise.all(toWait);
-    list.sort((a, b) => {return b.lastTime - a.lastTime})
-    return list;
+    try {
+      const snapshot = await this.chatListRef.once('value');
+      const toWait = [];
+      snapshot.forEach(async childSnapshot => {
+        toWait.push(this.parse(childSnapshot));
+      })
+      const list = await Promise.all(toWait);
+      list.sort((a, b) => {return b.lastTime - a.lastTime})
+      return list;
+    } catch (error) {
+        ToastAndroid.show(error.message);
+        return [];
+    }
   }
 
   refOn = async (callback) => {
