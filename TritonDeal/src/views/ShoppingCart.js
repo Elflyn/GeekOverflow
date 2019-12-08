@@ -64,7 +64,7 @@ export default class ShoppingCart extends React.Component {
       <ScrollView style={style.container}>
         {this.state.finished && <ActivityIndicator size='large' color='#eabb33' />}
         { this.state.empty ? 
-          <Text style={style.text}>Your cart is empty.</Text> :
+          <Text style={style.text}>Your cart is empty</Text> :
           !this.state.finished && (
           <View>
             {

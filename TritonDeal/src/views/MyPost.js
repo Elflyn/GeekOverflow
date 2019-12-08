@@ -24,7 +24,7 @@ export default class MyPost extends React.Component{
   }
 
   onReject = err => {
-    return firebase.storage().ref('avatar').child('default.jpeg').getDownloadURL();
+    return firebase.storage().ref('avatar').child('default.jpg').getDownloadURL();
   }
 
   getMyPost = async () => {
@@ -64,7 +64,7 @@ export default class MyPost extends React.Component{
       <ScrollView style={style.container}>
         {this.state.finished && <ActivityIndicator size='large' color='#eabb33' />}
         { this.state.empty ?
-          <Text style={style.text}>You haven't post anything yet.</Text> :
+          <Text style={style.text}>You haven't post anything yet</Text> :
           !this.state.finished && (
           <View>
             {
