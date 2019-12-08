@@ -257,7 +257,8 @@ class Post extends Component {
           <View style={style.section}>
             <Text style={style.title}>Description:</Text>
             <Input
-              placeholder="30 words limit"
+              maxLength={300}
+              placeholder="Put description for your item"
               onChangeText={value => this.setState({description: value})}
             />
           </View>
