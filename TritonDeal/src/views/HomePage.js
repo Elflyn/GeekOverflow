@@ -30,8 +30,8 @@ export default class HomePage extends Component {
     return url;
   }
 
-  onReject = err => {
-    return firebase.storage().ref('avatar').child('default.jpeg').getDownloadURL();
+  onReject = async err => {
+    return await firebase.storage().ref('avatar').child('default.jpg').getDownloadURL();
   }
 
   toggleActivityIndicator = () => {

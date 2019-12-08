@@ -103,7 +103,16 @@ const ActionButtons = ({ username, cid, sellerUID, price, itemName, imageSource,
               chatID = cid;
             }
             Actions._chatList();
-            Actions.chat({ title: username, chatID: chatID, imgURI: imageSource, itemName: itemName, price: price, sellerUID: sellerUID, postID: postKey, active: true })
+            const chatInfo = { title: username, 
+              chatID: chatID, 
+              imgURI: imageSource, 
+              itemName: itemName, 
+              price: price, 
+              sellerUID: sellerUID, 
+              postID: postKey, 
+              active: true 
+            };
+          Actions.chat(chatInfo);
           }} />
         }
         {inCart ?

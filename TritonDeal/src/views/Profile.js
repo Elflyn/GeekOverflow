@@ -32,7 +32,7 @@ export default class UserProfileView extends Component {
       const url = await ref.getDownloadURL();
       this.setState({ avatarURI: url });
     } catch (error) {
-      const url = await firebase.storage().ref('avatar').child('defaultAvatar.jpg').getDownloadURL();
+      const url = await firebase.storage().ref('avatar').child('default.jpg').getDownloadURL();
       this.setState({ avatarURI: url });
     }
   }

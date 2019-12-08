@@ -42,12 +42,7 @@ export default class Chat extends React.Component {
   
   updateAvatarURI = async () => {
     const ref = firebase.storage().ref('avatar').child(firebase.auth().currentUser.uid);
-    var url;
-    try {
-      url = await ref.getDownloadURL();
-    } catch (error) {
-      url = await firebase.storage().ref('avatar').child('default.jpeg').getDownloadURL();
-    }
+    const url = await ref.getDownloadURL().then((url) => { return url }).catch(async error => {return await firebase.storage().ref('avatar').child('default.jpg').getDownloadURL()});
     this.setState({ avatarURI: url });
   }
 

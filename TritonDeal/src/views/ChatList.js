@@ -94,7 +94,7 @@ export default class ChatList extends React.Component {
     try {
       url = await ref.getDownloadURL();
     } catch (error) {
-      url = await firebase.storage().ref('avatar').child('defaultAvatar.jpg').getDownloadURL();
+      url = await firebase.storage().ref('avatar').child('default.jpg').getDownloadURL();
     }
     return url;
   }
@@ -128,7 +128,7 @@ export default class ChatList extends React.Component {
       list.sort((a, b) => { return b.lastTime - a.lastTime })
       this.setState({ list: list });
     } catch (error) {
-      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+      //ToastAndroid.show(error.message, ToastAndroid.SHORT);
     }
   }
 
@@ -150,7 +150,7 @@ export default class ChatList extends React.Component {
 
   refOn = async (callback) => {
     var list_num;
-    if (this.props.initList.length) {
+    if (this.props.initList && this.props.initList.length) {
       list_num = this.props.initList.length;
     } else {
       list_num = 0;
@@ -191,12 +191,13 @@ export default class ChatList extends React.Component {
       postID: postID,
     }
     const chatRef = this.chatByIdRef.push(chat);
-    const chatListRef = firebase.database().ref('user_to_chat');
-    chatListRef.child(currUID).push({
+    const currUsrRef = firebase.database().ref('user_to_chat/' + currUID);
+    const otherUsrRef = firebase.database().ref('user_to_chat/' + anotherUID);
+    currUsrRef.push({
       chatID: chatRef.key,
       anotherUID: anotherUID
     });
-    chatListRef.child(anotherUID).push({
+    otherUsrRef.push({
       chatID: chatRef.key,
       anotherUID: currUID
     });
