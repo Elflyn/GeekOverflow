@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Text, StyleSheet } from 'react-native';
+import { ScrollView, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';
@@ -9,17 +9,32 @@ import '@react-native-firebase/storage';
 export default class ShoppingCart extends React.Component {
 
   state = {
-    post: []
+    post: [],
+    finished: false,
+    empty: false,
+  }
+
+  toggleActivityIndicator = () => {
+    this.setState({ finished: !this.state.finished });
+  };
+
+  onResolve = (url) => {
+    return url;
+  }
+
+  onReject = err => {
+    return firebase.storage().ref('avatar').child('default.jpeg').getDownloadURL();
   }
   
   getShoppingCart = async () => {
+    this.toggleActivityIndicator()
     let arr = []
     await firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid).once('value').then(async data => {
       const d = JSON.parse(JSON.stringify(data))
       for (var key in d) {
         await firebase.database().ref('post/' + d[key].post).once('value').then(async post => {
           const p = JSON.parse(JSON.stringify(post))
-          const avatar = await firebase.storage().ref('avatar').child(p.user).getDownloadURL();
+          const avatar = await firebase.storage().ref('avatar').child(p.user).getDownloadURL().then(this.onResolve, this.onReject);
           let i = 0
           let photos = [];
           for(; i < p.photos; i++) {
@@ -30,7 +45,8 @@ export default class ShoppingCart extends React.Component {
         })
       }
     })
-    this.setState({post: arr})
+    this.setState({post: arr, empty: arr.length === 0})
+    this.toggleActivityIndicator()
   }
 
   componentDidMount = () => {
@@ -39,9 +55,9 @@ export default class ShoppingCart extends React.Component {
   
   render() {
     return (
-      <ScrollView>
-
-        { this.state.post.length === 0 ? 
+      <ScrollView style={style.container}>
+        {this.state.finished && <ActivityIndicator size='large' color='#eabb33' />}
+        { this.state.empty ? 
           <Text style={style.text}>Your cart is empty.</Text> :
           this.state.post.map((item, index) => 
             <ItemDisplay 
@@ -51,8 +67,10 @@ export default class ShoppingCart extends React.Component {
               description={item.description}
               price={item.price}
               seller={item.seller}
+              postKey={item.key}
               sellerUID={item.sellerUID}
               username={item.username}
+              inCart={true}
             />)
         }
       </ScrollView>
@@ -66,5 +84,9 @@ const style = StyleSheet.create({
     color: 'gray',
     fontSize: 18,
     marginTop: 50
+  },
+
+  container: {
+    marginVertical: 10,
   }
 })

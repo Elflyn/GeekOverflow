@@ -27,7 +27,7 @@ export default class ItemDetail extends Component {
   }
 
   render() {
-    const {itemName, imageSource, tags, description, price, seller, sellerUID, username, postKey} = this.props
+    const {itemName, imageSource, tags, description, price, inCart, sellerUID, username, postKey} = this.props
     return (
       <View>
         <View>
@@ -64,6 +64,7 @@ export default class ItemDetail extends Component {
             itemName={itemName}
             price={price}
             postKey={postKey}
+            inCart={inCart}
           />
         </View>
       </View>
@@ -71,7 +72,7 @@ export default class ItemDetail extends Component {
   }
 }
 
-const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, postKey}) => {
+const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, postKey, inCart}) => {
   return (sellerUID != firebase.auth().currentUser.uid) ?
     <View style={{ flexDirection: "row", justifyContent: 'center' }}>
       <Button title="Contact Seller" buttonStyle={{ margin: 10 }} onPress={() => {
@@ -85,20 +86,32 @@ const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, 
         Actions._chatList();
         Actions.chat({ title: username, chatID: chatID, imgURI: imageSource, itemName: itemName, price: price })
       }} />
-      <Button 
-        onPress={ () => {
-         const userCartRef = firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid)
-         userCartRef.orderByChild('post').equalTo(postKey).once('value', snapshot => {
-           if (snapshot.exists()) {
-            Alert.alert('','You have added this item to you chart', [{text: 'OK', onDismiss: () => {}}])
-           } else {
-            userCartRef.push({post: postKey})
-           }
-         })
-        }}
-        title="Add to Cart"
-        buttonStyle={{ margin: 10 }} 
-       />
+      { inCart ? 
+        <Button 
+          onPress={ () => {
+            firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid).child(postKey).remove()
+            Actions.cart();
+          }}
+          title="Remove from the Chart"
+          buttonStyle={{ margin: 10 }} 
+        />     
+        : <Button 
+          onPress={ () => {
+            const userCartRef = firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid)
+            userCartRef.orderByChild('post').equalTo(postKey).once('value', snapshot => {
+            if (snapshot.exists()) {
+              Alert.alert('','This item is already in your cart! Check out your shopping Cart!', [{text: 'OK', onDismiss: () => {}}])
+            } else {
+              userCartRef.push({post: postKey})
+              Alert.alert('','You have successfully added this item to you chart!', [{text: 'OK', onDismiss: () => {}}])
+            }
+          })
+          }}
+          title="Add to Cart"
+          buttonStyle={{ margin: 10 }} 
+        />
+
+      }
     </View>
     : 
     <View style={{ flexDirection: "row", justifyContent: 'center' }}>

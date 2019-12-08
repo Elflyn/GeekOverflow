@@ -39,7 +39,8 @@ export default class UserProfileView extends Component {
   
   handleSignOut = () => {
     firebase.auth().signOut().then(() => {
-      ToastAndroid.show('Successfully signed out.', ToastAndroid.SHORT)
+      this.props.updateList();
+      ToastAndroid.show('Successfully signed out.', ToastAndroid.SHORT) 
       Actions.login();
     }).catch(error => {
       var errorCode = error.code;

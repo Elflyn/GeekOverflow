@@ -127,6 +127,7 @@ export default class HomePage extends Component {
                 sellerUID={item.sellerUID}
                 username={item.username}
                 postKey={item.key}
+                inCart={false}
                 />)
             }
           </ScrollView>      

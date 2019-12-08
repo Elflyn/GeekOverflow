@@ -217,7 +217,7 @@ export default class RouterComponent extends React.Component {
                 />
               </Scene>
               <Scene key="_account" iconName={'account'} icon={TabIcon}>
-                <Scene key="profile" component={Profile} hideNavBar onEnter={() => {Actions.refresh()}}/>
+                <Scene key="profile" component={Profile} hideNavBar onEnter={() => {Actions.refresh()}} updateList={() => this.list = []}/>
               </Scene>
             </Tabs>
           </Scene>
@@ -260,13 +260,14 @@ export default class RouterComponent extends React.Component {
             renderLeftButton={() => renderBackButton()}
           />
           <Scene
-            key="cart"
-            component={ShoppingCart}
-            navigationBarStyle={style.nav}
-            title="Shopping Cart"
-            titleStyle={style.title}
-            renderLeftButton={() => renderBackButton()}
+                key="cart"
+                component={ShoppingCart}
+                navigationBarStyle={style.nav}
+                title="Shopping Cart"
+                titleStyle={style.title}
+                renderLeftButton={() => ToHome()}
           />
+         
         </Stack>
       </Router>
     );
@@ -276,6 +277,16 @@ export default class RouterComponent extends React.Component {
 const renderBackButton = () => (
   <TouchableOpacity
     onPress={() => Actions.pop()}
+  >
+    <View style={{ alignItems: 'center' }}>
+      <Icon iconStyle={style.iconStyle} name="keyboard-arrow-left" type="MaterialIcons" />
+    </View>
+  </TouchableOpacity>
+);
+
+const ToHome = () => (
+  <TouchableOpacity
+    onPress={() => Actions._home()}
   >
     <View style={{ alignItems: 'center' }}>
       <Icon iconStyle={style.iconStyle} name="keyboard-arrow-left" type="MaterialIcons" />
