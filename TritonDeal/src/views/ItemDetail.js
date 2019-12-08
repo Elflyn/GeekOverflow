@@ -135,7 +135,7 @@ const ActionButtons = ({ username, cid, sellerUID, price, itemName, imageSource,
                 text: 'OK', onPress: async () => {
                   const postRef = firebase.database().ref('post');
                   postRef.child(postKey).update({ active: false });
-                  await props.cb();
+                  Actions.pop();
                 }
               },
             ],

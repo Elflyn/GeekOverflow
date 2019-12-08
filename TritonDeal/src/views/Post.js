@@ -53,7 +53,7 @@ class Post extends Component {
   };
 
   handleSentPostSuccess = () => {
-    Actions.home();
+    Actions.pop();
     this.setState({
       isVisible: false,
       title: '',

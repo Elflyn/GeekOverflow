@@ -152,7 +152,7 @@ export default class Chat extends React.Component {
             const url = await ref.getDownloadURL();
             await this.sendImage(url);
             this.toggleActivityIndicator();
-            ToastAndroid.show('Upload sucessful', ToastAndroid.SHORT);
+            //ToastAndroid.show('Upload sucessful', ToastAndroid.SHORT);
           })
         })
       })

@@ -61,7 +61,7 @@ export default class ChatList extends React.Component {
       });
     }).catch((error) => {
       var errorMessage = error.message;
-      //ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+      ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
     });
     const avatarURI = await this.getAvatar(anotherUID);
     const chatListItem = {
