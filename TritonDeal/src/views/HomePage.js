@@ -46,6 +46,9 @@ export default class HomePage extends Component {
       const d = JSON.parse(JSON.stringify(data))
       for (var key in d) {
         const post = d[key]
+        if (post.active === false) {
+          continue
+        }
         const avatar = await firebase.storage().ref('avatar').child(post.user).getDownloadURL().then(this.onResolve, this.onReject);
         let i = 0;
         let p = [];
@@ -128,6 +131,7 @@ export default class HomePage extends Component {
                 username={item.username}
                 postKey={item.key}
                 inCart={false}
+                active={true}
                 />)
             }
           </ScrollView>      

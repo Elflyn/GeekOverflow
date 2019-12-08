@@ -29,7 +29,7 @@ export default class ItemDetail extends Component {
   }
 
   render() {
-    const {itemName, imageSource, tags, description, price, inCart, sellerUID, username, postKey} = this.props
+    const {itemName, imageSource, tags, description, price, inCart, sellerUID, username, postKey, active} = this.props
     return (
       <View>
         <View>
@@ -67,6 +67,7 @@ export default class ItemDetail extends Component {
             price={price}
             postKey={postKey}
             inCart={inCart}
+            active={active}
           />
         </View>
       </View>
@@ -74,7 +75,7 @@ export default class ItemDetail extends Component {
   }
 }
 
-const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, postKey, inCart}) => {
+const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, postKey, inCart, active}) => {
   return (sellerUID != firebase.auth().currentUser.uid) ?
     <View style={{ flexDirection: "row", justifyContent: 'center' }}>
       <Button title="Contact Seller" buttonStyle={{ margin: 10 }} onPress={() => {
@@ -94,7 +95,7 @@ const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, 
             firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid).child(postKey).remove()
             Actions.cart();
           }}
-          title="Remove from the Chart"
+          title="Remove from the Cart"
           buttonStyle={{ margin: 10 }} 
         />     
         : <Button 
