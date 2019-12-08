@@ -66,8 +66,12 @@ export default class HomePage extends Component {
   updateSearchRes = (value) => {
     let temp = []
     for (const d of this.state.data){
-      const bool = d.title.toLowerCase().startsWith(value)
-      if (bool) {
+      const contain = d.title.toLowerCase().includes(value.toLowerCase());
+      var tagMatch = false;
+      for (const tag of d.tags) {
+        tagMatch = tag.toLowerCase().includes(value.toLowerCase()) || tagMatch;
+      }
+      if (contain || tagMatch) {
         temp.push(d);
       }
     }
