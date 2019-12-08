@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Text, StyleSheet, ActivityIndicator} from 'react-native';
+import { ScrollView, Text, StyleSheet, ActivityIndicator, View} from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';
@@ -10,6 +10,7 @@ export default class ShoppingCart extends React.Component {
 
   state = {
     post: [],
+    inactive: [],
     finished: false,
     empty: false,
   }
@@ -29,6 +30,7 @@ export default class ShoppingCart extends React.Component {
   getShoppingCart = async () => {
     this.toggleActivityIndicator()
     let arr = []
+    let inactive = []
     await firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid).once('value').then(async data => {
       const d = JSON.parse(JSON.stringify(data))
       for (var key in d) {
@@ -41,11 +43,15 @@ export default class ShoppingCart extends React.Component {
             const photo = await firebase.storage().ref('postImage').child(`${d[key].post}-${i}`).getDownloadURL();
             photos.push(photo);
           }
-          arr.push({title: p.title, source: photos, tags: p.tags, description: p.description, price: p.price, seller: avatar, sellerUID: p.user, username: p.username, key: key})
+          if (p.active === true) {
+            arr.push({title: p.title, source: photos, tags: p.tags, description: p.description, price: p.price, seller: avatar, sellerUID: p.user, username: p.username, key: key})
+          } else {
+            inactive.push({title: p.title, source: photos, tags: p.tags, description: p.description, price: p.price, seller: avatar, sellerUID: p.user, username: p.username, key: key})
+          }
         })
       }
     })
-    this.setState({post: arr, empty: arr.length === 0})
+    this.setState({post: arr, empty: arr.length === 0, inactive: inactive})
     this.toggleActivityIndicator()
   }
 
@@ -59,19 +65,57 @@ export default class ShoppingCart extends React.Component {
         {this.state.finished && <ActivityIndicator size='large' color='#eabb33' />}
         { this.state.empty ? 
           <Text style={style.text}>Your cart is empty.</Text> :
-          this.state.post.map((item, index) => 
-            <ItemDisplay 
-              itemName={item.title}
-              imageSource={item.source}
-              tags={item.tags}
-              description={item.description}
-              price={item.price}
-              seller={item.seller}
-              postKey={item.key}
-              sellerUID={item.sellerUID}
-              username={item.username}
-              inCart={true}
-            />)
+          !this.state.finished && (
+          <View>
+            {
+              this.state.post.length !== 0 && 
+              <View>
+                <Text style={style.title}>Available</Text>
+                {
+                  this.state.post.map((item, index) => 
+                    <ItemDisplay 
+                      itemName={item.title}
+                      imageSource={item.source}
+                      tags={item.tags}
+                      description={item.description}
+                      price={item.price}
+                      seller={item.seller}
+                      postKey={item.key}
+                      sellerUID={item.sellerUID}
+                      username={item.username}
+                      inCart={true}
+                      active={true}
+                    />)
+
+                }
+              </View>  
+            }
+            {
+              this.state.inactive.length !== 0 &&
+              <View>
+                <Text style={style.title}>InActive: </Text>
+                {
+                  this.state.inactive.map((item, index) => 
+                    <ItemDisplay 
+                      itemName={item.title}
+                      imageSource={item.source}
+                      tags={item.tags}
+                      description={item.description}
+                      price={item.price}
+                      seller={item.seller}
+                      postKey={item.key}
+                      sellerUID={item.sellerUID}
+                      username={item.username}
+                      inCart={true}
+                      active={false}
+                    />
+                  )}
+              </View>
+
+            }
+
+          </View>)
+          
         }
       </ScrollView>
     )
@@ -88,5 +132,12 @@ const style = StyleSheet.create({
 
   container: {
     marginVertical: 10,
+  },
+
+  title:{
+    marginTop: 10,
+    fontSize: 20,
+    marginLeft: 10,
+
   }
 })
