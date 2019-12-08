@@ -153,13 +153,13 @@ class Post extends Component {
 
   render() {
     const {
-      date,
       condition,
       tags,
       showInputBox,
       title,
       photos,
       price,
+      description,
     } = this.state;
     const conditions = [
       'Brand New',
@@ -197,7 +197,7 @@ class Post extends Component {
               <Avatar
                 containerStyle={style.padding}
                 title="+"
-                size={"large"}
+                size={'large'}
                 onPress={this.selectImage}
               />
             </View>
@@ -229,6 +229,7 @@ class Post extends Component {
           <View style={style.section}>
             <Text style={style.title}>Description:</Text>
             <Input
+              value={description}
               maxLength={300}
               placeholder="Put description for your item"
               onChangeText={value => this.setState({description: value})}
