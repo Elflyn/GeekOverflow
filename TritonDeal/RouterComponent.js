@@ -9,6 +9,7 @@ import ItemDetail from './src/views/ItemDetail'
 import Placeholder from './src/views/Placeholder'
 import ChatList from './src/views/ChatList'
 import ShoppingCart from './src/views/ShoppingCart'
+import MyPost from './src/views/MyPost'
 import Chat from './src/components/Chat'
 import Post from './src/views/Post'
 import Profile from './src/views/Profile';
@@ -269,7 +270,15 @@ export default class RouterComponent extends React.Component {
                 titleStyle={style.title}
                 renderLeftButton={() => ToHome()}
           />
-         
+          <Scene
+                key="mypost"
+                component={MyPost}
+                navigationBarStyle={style.nav}
+                title="My Post"
+                titleStyle={style.title}
+                renderLeftButton={() => ToHome()}
+          />
+
         </Stack>
       </Router>
     );
