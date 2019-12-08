@@ -132,7 +132,7 @@ export default class MyPost extends React.Component {
                       sellerUID={item.sellerUID}
                       username={item.username}
                       inCart={true}
-                      active={false}
+                      active={true}
                       cb={this.getShoppingCart}
                     />
                   ))}
