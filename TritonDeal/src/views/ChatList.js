@@ -128,7 +128,7 @@ export default class ChatList extends React.Component {
       list.sort((a, b) => { return b.lastTime - a.lastTime })
       this.setState({ list: list });
     } catch (error) {
-      ToastAndroid.show(error.message);
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
     }
   }
 
@@ -143,7 +143,7 @@ export default class ChatList extends React.Component {
       list.sort((a, b) => {return b.lastTime - a.lastTime})
       return list;
     } catch (error) {
-        ToastAndroid.show(error.message);
+        ToastAndroid.show(error.message, ToastAndroid.SHORT);
         return [];
     }
   }

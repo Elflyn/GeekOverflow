@@ -38,11 +38,12 @@ export default class HomePage extends Component {
     this.setState({ finished: !this.state.finished });
   };
   
-  
+
   getPost = async () => {
+    this.setState({data: []});
     this.toggleActivityIndicator()
     let arr = []
-    await firebase.database().ref('post').once('value').then(async data => {
+    await firebase.database().ref('post').orderByKey().once('value').then(async data => {
       const d = JSON.parse(JSON.stringify(data))
       for (var key in d) {
         const post = d[key]
@@ -52,14 +53,25 @@ export default class HomePage extends Component {
         const avatar = await firebase.storage().ref('avatar').child(post.user).getDownloadURL().then(this.onResolve, this.onReject);
         let i = 0;
         let p = [];
-        for(; i < post.photos; i++) {
+        for (; i < post.photos; i++) {
           const photo = await firebase.storage().ref('postImage').child(`${key}-${i}`).getDownloadURL();
           p.push(photo);
         }
-        arr.push({title: post.title, source: p, tags: post.tags, description: post.description, price: post.price, seller: avatar, sellerUID: post.user, username: post.username, key: key, active: post.active})
+        let postItem = { title: post.title, 
+          source: p, 
+          tags: post.tags, 
+          description: post.description, 
+          price: post.price, 
+          seller: avatar, 
+          sellerUID: post.user, 
+          username: post.username, 
+          key: key, 
+          active: post.active 
+        };
+        this.setState({ data: [...this.state.data, postItem] });
       }
     })
-    this.setState({data: arr})
+    //this.setState({ data: arr })
     this.toggleActivityIndicator()
   }
 
@@ -89,8 +101,9 @@ export default class HomePage extends Component {
   }
 
   onRefresh = () => {
-    this.setState({refreshing: true});
-    this.wait(2000).then(() => {this.getPost(); this.setState({refreshing: false})});
+    this.setState({ refreshing: true });
+    this.getPost(); 
+    this.setState({ refreshing: false });
   }
 
   render(){
