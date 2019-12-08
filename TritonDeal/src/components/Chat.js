@@ -20,7 +20,6 @@ export default class Chat extends React.Component {
   }
 
   componentWillMount = () => {
-    console.log(this.props.active)
     this.setState({active: this.props.active});
   }
 

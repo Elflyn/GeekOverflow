@@ -85,7 +85,6 @@ export default class ChatList extends React.Component {
     if (lastBy == firebase.auth().currentUser.uid) {
       chatListItem.read = true;
     }
-    console.log(chatListItem)
     return chatListItem;
   };
 

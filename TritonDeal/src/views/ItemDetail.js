@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button } from 'react-native-elements';
-import { StyleSheet, View, Image, Text, ScrollView, Alert } from 'react-native';
+import { StyleSheet, View, Image, Text, ScrollView, Alert, ToastAndroid } from 'react-native';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/database';
@@ -23,7 +23,7 @@ export default class ItemDetail extends Component {
         }
       })
     }).catch(error => {
-      console.log(error.message);
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
     })
     this.setState({chatID: cid})
   }
