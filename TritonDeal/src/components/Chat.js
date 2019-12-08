@@ -46,7 +46,7 @@ export default class Chat extends React.Component {
     try {
       url = await ref.getDownloadURL();
     } catch (error) {
-      url = await firebase.storage().ref('avatar').child('defaultAvatar.jpg').getDownloadURL();
+      url = await firebase.storage().ref('avatar').child('default.jpeg').getDownloadURL();
     }
     this.setState({ avatarURI: url });
   }
