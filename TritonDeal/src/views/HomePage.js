@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {SearchBar,Overlay,Icon,ListItem, ThemeProvider} from 'react-native-elements'
-import {View,TouchableOpacity,FlatList,StyleSheet, RefreshControl, ScrollView, Dimensions} from 'react-native';
+import {View,TouchableOpacity, ActivityIndicator, StyleSheet, RefreshControl, ScrollView, Dimensions} from 'react-native';
 import ItemDisplay from '../components/ItemDisplay'
 import TopNavBar from '../components/TopNavBar'
 import firebase from '@react-native-firebase/app';
@@ -21,7 +21,8 @@ export default class HomePage extends Component {
     searching: false,
     refreshing: false,
     data: [],
-    searchRes:[]
+    searchRes:[],
+    finished: false,
     };
     
   updateSearch = (value) => {
@@ -39,9 +40,14 @@ export default class HomePage extends Component {
   onReject = err => {
     return firebase.storage().ref('avatar').child('default.jpeg').getDownloadURL();
   }
+
+  toggleActivityIndicator = () => {
+    this.setState({ finished: !this.state.finished });
+  };
   
   
   getPost = async () => {
+    this.toggleActivityIndicator()
     let arr = []
     await firebase.database().ref('post').once('value').then(async data => {
       const d = JSON.parse(JSON.stringify(data))
@@ -58,6 +64,7 @@ export default class HomePage extends Component {
       }
     })
     this.setState({data: arr})
+    this.toggleActivityIndicator()
   }
 
   updateSearchRes = (value) => {
@@ -87,7 +94,7 @@ export default class HomePage extends Component {
   }
 
   render(){
-    const { searchRes, data, search } = this.state
+    const { searchRes, data, search, finished } = this.state
     let arr = this.state.searching ? searchRes : data
     return (
       <View style={style.container}>
@@ -111,6 +118,7 @@ export default class HomePage extends Component {
             </TouchableOpacity>
         </View>
         <View style={{marginBottom: 60}}>
+           {finished && <ActivityIndicator size='large' color='#eabb33' />}
           <ScrollView
             refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />}
           >
