@@ -41,8 +41,7 @@ export default class RouterComponent extends React.Component {
     Linking.addEventListener("url", this.handeLaunchByUrl);
     BackHandler.addEventListener('hardwareBackPress', () => this.handleBackButton())
     if (firebase.auth().currentUser) {
-      this.handleFCMRegi
-      ster();
+      this.handleFCMRegister();
     }
   }
 

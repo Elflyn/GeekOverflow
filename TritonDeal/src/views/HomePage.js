@@ -102,8 +102,7 @@ export default class HomePage extends Component {
 
   onRefresh = () => {
     this.setState({ refreshing: true });
-    this.getPost(); 
-    this.setState({ refreshing: false });
+    this.wait(500).then(() => {this.getPost(); this.setState({refreshing: false})});
   }
 
   render(){
