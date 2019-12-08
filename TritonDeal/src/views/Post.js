@@ -222,7 +222,7 @@ class Post extends Component {
           />
 
         </View>
-        <View>
+        <View style={{marginBottom: 50}}>
           {showDatePicker &&
             <DateTimePicker
               value={dateValue}
@@ -233,8 +233,9 @@ class Post extends Component {
               minimumDate={new Date()}
             />
           }
+          <GradientButton text='Post' onPress={this.handleNewPost} />
         </View>
-        <GradientButton text='Post' onPress={this.handleNewPost} />
+        
         <InputBox
           cancel={this.toggleInputBox}
           confirm={(input) => { this.updateTags(input); this.toggleInputBox() }}

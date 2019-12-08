@@ -40,9 +40,10 @@ export default class ChatList extends React.Component {
   parse = async (snapshot) => {
     const { chatID: chatID } = snapshot.val();
     const chatRef = firebase.database().ref('chat_by_id');
-    var title, message, lastTime, anotherUID, imgURI, itemName, price, lastRead, lastBy;
+    var title, message, lastTime, anotherUID, imgURI, itemName, price, lastRead, lastBy, sellerUID, postID;
     await chatRef.orderByKey().equalTo(chatID).once('value').then(async (snapshot) => {
       snapshot.forEach(async childSnapshot => {
+        sellerUID = childSnapshot.val().user2;
         if (childSnapshot.val().user1 === firebase.auth().currentUser.uid) {
           anotherUID = childSnapshot.val().user2;
         } else {
@@ -56,10 +57,11 @@ export default class ChatList extends React.Component {
         price = childSnapshot.val().price;
         lastRead = childSnapshot.val().lastRead;
         lastBy = childSnapshot.val().lastBy;
+        postID = childSnapshot.val().postID;
       });
     }).catch((error) => {
       var errorMessage = error.message;
-      ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+      //ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
     });
     const avatarURI = await this.getAvatar(anotherUID);
     const chatListItem = {
@@ -71,11 +73,19 @@ export default class ChatList extends React.Component {
       imgURI: imgURI,
       itemName: itemName,
       price: price,
-      read: lastRead
+      read: lastRead,
+      sellerUID: sellerUID,
+      postID: postID,
     }
+    const postRef = firebase.database().ref('post');
+    const active = await postRef.child(chatListItem.postID).once('value').then(snapshot => {
+      return snapshot.val().active;
+    })
+    chatListItem.active = active;
     if (lastBy == firebase.auth().currentUser.uid) {
       chatListItem.read = true;
     }
+    console.log(chatListItem)
     return chatListItem;
   };
 
@@ -153,29 +163,7 @@ export default class ChatList extends React.Component {
     this.chatListRef.off();
   }
 
-  onPressOK = async () => {
-    this.setState({ isVisible: false });
-    if (this.state.email) {
-      const currUID = firebase.auth().currentUser.uid;
-      var anotherUID = '';
-      const uidRef = firebase.database().ref('users');
-      await uidRef.orderByChild('email').equalTo(this.state.email).once('value').then((snapshot) => {
-        snapshot.forEach(childSnapshot => {
-          anotherUID = childSnapshot.val().uid;
-        })
-      }).catch((error) => {
-        var errorMessage = error.message;
-        ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
-      });
-      if (!anotherUID) {
-        ToastAndroid.show('User not found!', ToastAndroid.SHORT);
-      } else {
-        this.createChat(currUID, anotherUID, null)
-      }
-    }
-  }
-
-  createChat = (currUID, anotherUID, firstImgUrl, itemName, price) => {
+  createChat = (currUID, anotherUID, firstImgUrl, itemName, price, postID) => {
     const chat = {
       user1: currUID,
       user2: anotherUID,
@@ -191,7 +179,8 @@ export default class ChatList extends React.Component {
       img: firstImgUrl,
       itemName: itemName,
       price: price,
-      lastRead: false
+      lastRead: false,
+      postID: postID,
     }
     const chatRef = this.chatByIdRef.push(chat);
     const chatListRef = firebase.database().ref('user_to_chat');
@@ -226,6 +215,7 @@ export default class ChatList extends React.Component {
 
   render() {
     return (
+      this.state.list.length != 0 ?
       <View>
         <ScrollView refreshControl={
           <RefreshControl
@@ -245,7 +235,7 @@ export default class ChatList extends React.Component {
                 subtitle={<Subtitle message={item.message} timeString={getTimeString(item.lastTime)} />}
                 rightAvatar={{ size: 65, source: { uri: item.imgURI } }}
                 onPress={() => {
-                  Actions.chat({ title: item.name, chatID: item.chatID, imgURI: item.imgURI, itemName: item.itemName, price: item.price })
+                  Actions.chat({ title: item.name, chatID: item.chatID, imgURI: item.imgURI, itemName: item.itemName, price: item.price, sellerUID: item.sellerUID, postID: item.postID, active: item.active })
                   firebase.database().ref('chat_by_id/' + item.chatID).update({lastRead: true});
                 }}
                 badge
@@ -258,35 +248,15 @@ export default class ChatList extends React.Component {
                   subtitle={<Subtitle message={item.message} timeString={getTimeString(item.lastTime)} />}
                   rightAvatar={{ size: 65, source: { uri: item.imgURI } }}
                   onPress={() => {
-                    Actions.chat({ title: item.name, chatID: item.chatID, imgURI: item.imgURI, itemName: item.itemName, price: item.price })
+                    Actions.chat({ title: item.name, chatID: item.chatID, imgURI: item.imgURI, itemName: item.itemName, price: item.price, sellerUID: item.sellerUID, postID: item.postID, active: item.active })
                   }}
                 />
               ))
           }
         </ScrollView>
-        <Overlay style={style.box}
-          isVisible={this.state.isVisible}
-          windowBackgroundColor="rgba(255, 255, 255, .8)"
-          overlayBackgroundColor="white"
-          width={350}
-          height="auto"
-        >
-          <View>
-            <Text style={style.centerText}>{this.state.dialogText}</Text>
-            <Input
-              placeholder="Email"
-              leftIcon={
-                <Icon iconStyle={style.iconStyle} name="envelope" type="evilicon" />
-              }
-              onChangeText={(value) => this.setState({ email: value })}
-            />
-            <GradientButton
-              text={"OK"}
-              onPress={this.onPressOK}
-            />
-          </View>
-        </Overlay>
       </View>
+      :
+      <Text style={style.text}>No active chat</Text>
     )
   }
 }
@@ -330,5 +300,11 @@ const style = StyleSheet.create({
   time: {
     fontSize: 12,
     color: 'gray'
-  }
+  },
+  text: {
+    textAlign: 'center',
+    color: 'gray',
+    fontSize: 18,
+    marginTop: 50
+  },
 })

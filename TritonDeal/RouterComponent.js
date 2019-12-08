@@ -160,6 +160,7 @@ export default class RouterComponent extends React.Component {
     }
     if (navigation.state.routeName == '_chatList') {
       Actions.jump('chatList', {initList: this.list});
+      this.list = [];
       return true;
     }
     defaultHandler()

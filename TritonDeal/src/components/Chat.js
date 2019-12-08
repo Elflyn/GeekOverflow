@@ -5,7 +5,7 @@ import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/database';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/storage';
-import { View, TouchableOpacity, StyleSheet, Text, ActivityIndicator, ToastAndroid, Button } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text, ActivityIndicator, ToastAndroid, Button, Alert } from 'react-native';
 import { ListItem, Icon, Overlay } from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';
 import RBSheet from "react-native-raw-bottom-sheet";
@@ -15,7 +15,13 @@ export default class Chat extends React.Component {
   state = {
     messages: [],
     avatarURI: null,
-    finished: true
+    finished: true,
+    active: true
+  }
+
+  componentWillMount = () => {
+    console.log(this.props.active)
+    this.setState({active: this.props.active});
   }
 
   componentDidMount = async () => {
@@ -94,10 +100,6 @@ export default class Chat extends React.Component {
     })
     const anotherUID = firebase.auth().currentUser.uid === users.user1 ? users.user2 : users.user1;
     rootRef.update({ lastText: messages[messages.length - 1].text, lastTime: this.timestamp, lastRead: false, lastBy: firebase.auth().currentUser.uid });
-    var httpRequest = new XMLHttpRequest();
-    const requestURI = 'https://us-central1-tritondeal.cloudfunctions.net/sendPushNotification?title=' + firebase.auth().currentUser.displayName + "&msg=" + messages[messages.length - 1].text + "&uid=" + anotherUID
-    httpRequest.open('GET', requestURI, true);
-    httpRequest.send();
   };
 
   get ref() {
@@ -172,6 +174,20 @@ export default class Chat extends React.Component {
     await rootRef.update({ lastText: '[Image]', lastTime: this.timestamp, lastRead: false, lastBy: firebase.auth().currentUser.uid })
   }
 
+  sendSoldMessage = async () => {
+    this.setState({active: false})
+    const cl = Actions.refs.chatList;
+    cl.updateList();
+    const message = {
+      text: 'Item has been marked as sold',
+      system: true,
+      createdAt: this.timestamp,
+    };
+    this.ref.push(message);
+    const rootRef = firebase.database().ref('chat_by_id/' + this.props.chatID);
+    await rootRef.update({ lastText: 'Item has been marked as sold', lastTime: this.timestamp, lastRead: false, lastBy: firebase.auth().currentUser.uid })
+  }
+
   render() {
     return (
       <View style={{ flex: 1 }}>
@@ -179,7 +195,10 @@ export default class Chat extends React.Component {
           title={this.props.itemName} 
           leftAvatar={{ source: { uri: this.props.imgURI } }}
           rightElement={
-            <Button title='Button' />
+            this.state.active ?
+            <ConfirmButton sellerUID={this.props.sellerUID} postID={this.props.postID} cb={this.sendSoldMessage}/>
+            :
+            null
           }
           subtitle={'$ ' + this.props.price}/>
         <GiftedChat
@@ -220,8 +239,30 @@ export default class Chat extends React.Component {
       </View>
     );
   }
+};
+
+const ConfirmButton = (props) => {
+  return (props.sellerUID == firebase.auth().currentUser.uid) ?
+    <Button title='Mark as sold'onPress={() => {
+      Alert.alert(
+        null,
+        'Thank you. Your email address has been verified.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          { text: 'OK', onPress: async () => {
+            const postRef = firebase.database().ref('post');
+            postRef.child(props.postID).update({ active: false });
+            await props.cb();
+          }},
+        ],
+      );
+    }}/>
+    : null
 }
-;
+
 const style = StyleSheet.create({
   iconStyle: {
     color: '#004862',

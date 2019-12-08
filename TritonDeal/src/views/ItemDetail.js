@@ -14,11 +14,13 @@ export default class ItemDetail extends Component {
   };
 
   componentWillMount = async () => {
-    const chatListRef = firebase.database().ref('user_to_chat/' + firebase.auth().currentUser.uid);
+    const chatListRef = firebase.database().ref('chat_by_id');
     var cid;
-    await chatListRef.orderByChild('anotherUID').equalTo(this.props.sellerUID).once('value').then((snapshot) => {
+    await chatListRef.orderByChild('postID').equalTo(this.props.postKey).once('value').then((snapshot) => {
       snapshot.forEach(childSnapshot => {
-        cid = childSnapshot.val().chatID;
+        if (firebase.auth().currentUser.uid == childSnapshot.val().user1) {
+          cid = childSnapshot.key;
+        }
       })
     }).catch(error => {
       console.log(error.message);
@@ -79,12 +81,12 @@ const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, 
         var chatID;
         if (!cid) {
           const cl = new ChatList();
-          chatID = cl.createChat(firebase.auth().currentUser.uid, sellerUID, imageSource, itemName, price);
+          chatID = cl.createChat(firebase.auth().currentUser.uid, sellerUID, imageSource, itemName, price, postKey);
         } else {
           chatID = cid;
         }
         Actions._chatList();
-        Actions.chat({ title: username, chatID: chatID, imgURI: imageSource, itemName: itemName, price: price })
+        Actions.chat({ title: username, chatID: chatID, imgURI: imageSource, itemName: itemName, price: price, sellerUID: sellerUID, postID: postKey, active: true })
       }} />
       { inCart ? 
         <Button 
