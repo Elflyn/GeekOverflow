@@ -106,6 +106,7 @@ const choice = [
     title: 'My Post',
     icon: 'comment',
     type: 'evilicon',
+    onPress: () => Actions.mypost(),
     style: {
       color: '#F9B300',
       ...listStyle.iconStyle,
@@ -115,7 +116,7 @@ const choice = [
 ];
 
 export class InfoList extends React.Component {
-  
+
   constructor(props) {
     super(props);
     this.updateUserInfo();
