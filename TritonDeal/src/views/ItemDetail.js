@@ -79,17 +79,19 @@ const ActionButtons = ({username, cid, sellerUID, price, itemName, imageSource, 
   if (sellerUID != firebase.auth().currentUser.uid) {
     return (
       <View style={{ flexDirection: "row", justifyContent: 'center' }}>
-        <Button title="Contact Seller" buttonStyle={{ margin: 10 }} onPress={() => {
-          var chatID;
-          if (!cid) {
-            const cl = new ChatList();
-            chatID = cl.createChat(firebase.auth().currentUser.uid, sellerUID, imageSource, itemName, price, postKey);
-          } else {
-            chatID = cid;
-          }
-          Actions._chatList();
-          Actions.chat({ title: username, chatID: chatID, imgURI: imageSource, itemName: itemName, price: price, sellerUID: sellerUID, postID: postKey, active: true })
-        }} />
+        {active &&
+          <Button title="Contact Seller" buttonStyle={{ margin: 10 }} onPress={() => {
+            var chatID;
+            if (!cid) {
+              const cl = new ChatList();
+              chatID = cl.createChat(firebase.auth().currentUser.uid, sellerUID, imageSource, itemName, price, postKey);
+            } else {
+              chatID = cid;
+            }
+            Actions._chatList();
+            Actions.chat({ title: username, chatID: chatID, imgURI: imageSource, itemName: itemName, price: price, sellerUID: sellerUID, postID: postKey, active: true })
+          }} />
+        }
         {inCart ?
           <Button
             onPress={() => {
