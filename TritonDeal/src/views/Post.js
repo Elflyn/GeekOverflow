@@ -157,16 +157,16 @@ class Post extends Component {
   }
 
   render() {
-    const { showDatePicker, date, condition, dateValue, tags, showInputBox, title, photos } = this.state;
+    const { showDatePicker, date, condition, dateValue, tags, showInputBox, title, photos, price } = this.state;
     const conditions = ['Brand New', 'Like New', 'Used', 'Acceptable'];
     return (
       <ScrollView>
         <View style={style.upperContainer}>
           <View style={style.section}>
             <Text style={style.title}>Item Title:</Text>
-            <Input placeholder="Title" onChangeText={value => this.setState({ title: value })} />
+            <Input value={title} placeholder="Title" onChangeText={value => this.setState({ title: value })} />
             <Text style={style.title}>Price:</Text>
-            <Input placeholder="Price" onChangeText={value => this.setState({ price: value })} keyboardType="numeric"/>
+            <Input  value={price} placeholder="Price" onChangeText={value => this.setState({ price: value })} keyboardType="numeric"/>
             <Divider style={style.divider} />
           </View>
           <View style={style.section}>
