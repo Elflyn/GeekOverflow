@@ -85,6 +85,7 @@ export default class ShoppingCart extends React.Component {
                       username={item.username}
                       inCart={true}
                       active={true}
+                      cb={this.getShoppingCart}
                     />)
 
                 }
@@ -108,6 +109,7 @@ export default class ShoppingCart extends React.Component {
                       username={item.username}
                       inCart={true}
                       active={false}
+                      cb={this.getShoppingCart}
                     />
                   )}
               </View>

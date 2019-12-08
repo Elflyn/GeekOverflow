@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Button } from 'react-native-elements';
-import { StyleSheet, View, Image, Text, ScrollView, Alert, ToastAndroid } from 'react-native';
+import { Button, Overlay } from 'react-native-elements';
+import { StyleSheet, View, Image, Text, ScrollView, Alert, ToastAndroid, ActivityIndicator } from 'react-native';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/database';
@@ -10,7 +10,8 @@ import ChatList from './ChatList';
 export default class ItemDetail extends Component {
 
   state = {
-    chatID: null
+    chatID: null,
+    finished: true
   };
 
   componentWillMount = async () => {
@@ -27,11 +28,22 @@ export default class ItemDetail extends Component {
     })
     this.setState({chatID: cid})
   }
+  
+  toggleActivityIndicator = () => {
+    this.setState({ finished: !this.state.finished });
+  };
 
   render() {
-    const {itemName, imageSource, tags, description, price, inCart, sellerUID, username, postKey, active} = this.props
+    const {itemName, imageSource, tags, description, price, inCart, sellerUID, username, postKey, active, cb} = this.props
     return (
       <View>
+        <Overlay
+          isVisible={!this.state.finished}
+          width="auto"
+          height="auto"
+        >
+          <ActivityIndicator size='large' color='#eabb33' />
+        </Overlay>
         <View>
           <View style={style.detailTitleRow}>
             <Text style={style.detailTitle}>{itemName}</Text>
@@ -68,6 +80,8 @@ export default class ItemDetail extends Component {
             postKey={postKey}
             inCart={inCart}
             active={active}
+            cb={cb}
+            toogle={this.toggleActivityIndicator}
           />
         </View>
       </View>
@@ -75,7 +89,7 @@ export default class ItemDetail extends Component {
   }
 }
 
-const ActionButtons = ({ username, cid, sellerUID, price, itemName, imageSource, postKey, inCart, active }) => {
+const ActionButtons = ({ username, cid, sellerUID, price, itemName, imageSource, postKey, inCart, active, cb, toogle }) => {
   if (firebase.auth().currentUser && sellerUID != firebase.auth().currentUser.uid) {
     return (
       <View style={{ flexDirection: "row", justifyContent: 'center' }}>
@@ -95,8 +109,12 @@ const ActionButtons = ({ username, cid, sellerUID, price, itemName, imageSource,
         {inCart ?
           <Button
             onPress={() => {
+              toogle();
               firebase.database().ref('user_to_cart/' + firebase.auth().currentUser.uid).child(postKey).remove()
-              Actions.cart();
+              cb().then(() => {
+                toogle()
+                Actions.pop();
+              });
             }}
             title="Remove from the Cart"
             buttonStyle={{ margin: 10 }}
