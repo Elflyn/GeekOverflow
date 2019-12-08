@@ -144,7 +144,9 @@ const ActionButtons = ({ username, cid, sellerUID, price, itemName, imageSource,
       </View>
     )
   } else {
-    return null;
+    return (
+      <Text style={style.text}>Please login to view more</Text>
+    );
   }
 }
 
@@ -258,6 +260,12 @@ const style = StyleSheet.create({
   detailTagText:{
     color:"black",
     fontSize:22
+  },
+  text: {
+    textAlign: 'center',
+    color: 'gray',
+    fontSize: 18,
+    marginTop: 50
   },
 
 });

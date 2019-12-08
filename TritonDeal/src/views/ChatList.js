@@ -264,7 +264,13 @@ export default class ChatList extends React.Component {
         </ScrollView>
       </View>
       :
-      <Text style={style.text}>No active chat</Text>
+      <ScrollView refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={this.onRefresh} />
+      }>
+        <Text style={style.text}>No active chat</Text>
+      </ScrollView>
     )
   }
 }
