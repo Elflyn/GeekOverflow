@@ -113,7 +113,7 @@ export default class HomePage extends Component {
               <Icon type="entypo" name="shopping-cart" color="#006A96" containerStyle={style.backIcon} size={30} />
             </TouchableOpacity>
         </View>
-        <View style={{marginBottom: 60}}>
+        <View style={{marginBottom: 40}}>
            {finished && <ActivityIndicator size='large' color='#eabb33' />}
           <ScrollView
             refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />}
