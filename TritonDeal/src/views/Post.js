@@ -226,7 +226,7 @@ class Post extends Component {
               <Avatar
                 containerStyle={style.padding}
                 title="+"
-                size="large"
+                size={"large"}
                 onPress={this.selectImage}
               />
             </View>
@@ -237,6 +237,7 @@ class Post extends Component {
               <Badge
                 onPress={() => this.removeTag(index)}
                 badgeStyle={style.badgeStyle}
+                textStyle={{fontSize: 18}}
                 containerStyle={style.badge}
                 value={tag}
                 status="primary"
@@ -246,7 +247,7 @@ class Post extends Component {
               containerStyle={style.padding}
               rounded
               title="+"
-              size="small"
+              size="18"
               onPress={this.toggleInputBox}
             />
             <Text style={{fontSize: 18, marginLeft: 5, paddingVertical: 5}}>
@@ -358,15 +359,17 @@ const style = StyleSheet.create({
 
   padding: {
     marginLeft: 5,
+    marginTop: 3,
   },
 
   badge: {
+    marginTop: 1,
     paddingVertical: 4,
     marginHorizontal: 2,
   },
 
   badgeStyle: {
-    height: 25,
+    height: 30,
   },
 });
 

@@ -31,7 +31,9 @@ export default class ItemDisplay extends Component{
               })
             }
           </View>
-          <Text style={style.price}>${price}</Text>
+          <View style={{height: 35}}>
+            <Text style={style.price}>${price}</Text>
+          </View>
           <View style={style.bottomStyle}>
             <Avatar rounded source={{uri: seller}} size={35}/>
           </View>
@@ -74,6 +76,7 @@ const style = StyleSheet.create({
     padding:1,
     flexDirection:"row",
     flexWrap:"wrap",
+    height: 27
     //justifyContent:"space-between"
   },
   tag:{
@@ -86,9 +89,7 @@ const style = StyleSheet.create({
     color:"black",
   },
   price:{
-    flex:1,
     fontSize:24,
-
   },
   bottomStyle:{
     flexDirection:"row",
