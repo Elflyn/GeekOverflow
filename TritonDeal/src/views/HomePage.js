@@ -31,6 +31,14 @@ export default class HomePage extends Component {
   toggleSearching = () => {
     this.setState({searching: !this.state.searching});
   }
+
+  onResolve = (url) => {
+    return url;
+  }
+
+  onReject = err => {
+    return firebase.storage().ref('avatar').child('default.jpeg').getDownloadURL();
+  }
   
   
   getPost = async () => {
@@ -39,7 +47,7 @@ export default class HomePage extends Component {
       const d = JSON.parse(JSON.stringify(data))
       for (var key in d) {
         const post = d[key]
-        const avatar = await firebase.storage().ref('avatar').child(post.user).getDownloadURL();
+        const avatar = await firebase.storage().ref('avatar').child(post.user).getDownloadURL().then(this.onResolve, this.onReject);
         let i = 0;
         let p = [];
         for(; i < post.photos; i++) {

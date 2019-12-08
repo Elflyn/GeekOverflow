@@ -13,7 +13,7 @@ export default class ItemDisplay extends Component{
   }
 
   render(){
-  const {itemName, imageSource, tags, description, price, seller, sellerUID, username, postKey} = this.props
+    const {itemName, imageSource, tags, description, price, seller, sellerUID, username, postKey} = this.props
     return(
       <TouchableOpacity style={style.container} onPress={() => Actions.detail({sellerUID: sellerUID, imageSource: imageSource, description: description, username: username, postKey: postKey, price: price, tags: tags, itemName: itemName})} activeOpacity={1}>
         <Image source={{uri:this.props.imageSource[0]}}
